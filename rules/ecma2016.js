@@ -1,30 +1,31 @@
 module.exports = {
     meta: {
-        type: "problem",
         docs: {
-            description: "disallow the use of `debugger`",
-            category: "Possible Errors",
-            recommended: true,
-            url: "https://eslint.org/docs/rules/no-debugger"
-        },
-
-        fixable: null,
-        schema: [],
-
-        messages: {
-            unexpected: "Unexpected 'debugger' statement."
+            description: "ecma2016 rules",
         }
     },
-
     create(context) {
         return {
-            DebuggerStatement(node) {
-                // context.report({
-                //     node,
-                //     messageId: "unexpected"
-                // });
+            // export {foo, bar}
+            ExportNamedDeclaration(node) {
+                context.report({
+                    node,
+                    message: `Using ExportNamedDeclaration is not allowed`
+                })
+            },
+            ExportDefaultDeclaration(node) {
+                context.report({
+                    node,
+                    message: `Using ExportDefaultDeclaration is not allowed`
+                })
+            },
+            // export * from "mod"
+            ExportAllDeclaration(node) {
+                context.report({
+                    node,
+                    message: `Using ExportAllDeclaration is not allowed`
+                })
             }
-        };
-
+        }
     }
-};
+}

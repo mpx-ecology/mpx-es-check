@@ -67,7 +67,6 @@ program
         log(chalk.red('Invalid ecmaScript version'))
         process.exit(1)
     }
-    console.log('in this')
     runParseCode(e, esmodule, files)
   })
 
