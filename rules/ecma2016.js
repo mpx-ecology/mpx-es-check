@@ -1,24 +1,24 @@
 module.exports = {
   meta: {
     docs: {
-      description: "ecma2016 rules",
+      description: 'ecma2016 rules'
     }
   },
-  create(context) {
+  create (context) {
     return {
-      BinaryExpression(node) {
+      BinaryExpression (node) {
         if (node.operator === '**') {
           context.report({
             node,
-            message: `Using BinaryExpression operator ** is not allowed`
+            message: 'Using BinaryExpression operator ** is not allowed'
           })
         }
       },
-      AssignmentExpression(node) {
+      AssignmentExpression (node) {
         if (node.operator === '**=') {
           context.report({
             node,
-            message: `Using AssignmentExpression operator **= is not allowed`
+            message: 'Using AssignmentExpression operator **= is not allowed'
           })
         }
       }

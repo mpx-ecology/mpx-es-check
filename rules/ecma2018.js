@@ -1,18 +1,18 @@
 module.exports = {
   meta: {
     docs: {
-      description: "ecma2018 rules",
+      description: 'ecma2018 rules'
     }
   },
-  create(context) {
+  create (context) {
     return {
-      ForOfStatement(node) {
+      ForOfStatement (node) {
         context.report({
           node,
-          message: `Using ForOfStatement is not allowed`
+          message: 'Using ForOfStatement is not allowed'
         })
       },
-      ObjectExpression(node) {
+      ObjectExpression (node) {
         /**
          * extend interface ObjectExpression {
               properties: [ Property | SpreadElement ];
@@ -28,20 +28,20 @@ module.exports = {
           if (hasSpreadElement) {
             context.report({
               node,
-              message: `Using hasSpreadElement in ObjectExpression is not allowed`
+              message: 'Using hasSpreadElement in ObjectExpression is not allowed'
             })
           }
         }
       },
-      TemplateElement(node) {
+      TemplateElement (node) {
         if (node.value && node.value.cooked === null) {
           context.report({
             node,
-            message: `Using TemplateElement has cooked null is not allowed`
+            message: 'Using TemplateElement has cooked null is not allowed'
           })
         }
       },
-      ObjectPattern(node) {
+      ObjectPattern (node) {
         if (node.properties && node.properties.length) {
           let hasRestElement = false
           for (const property of node.properties) {
@@ -52,7 +52,7 @@ module.exports = {
           if (hasRestElement) {
             context.report({
               node,
-              message: `Using RestElement in ObjectPattern is not allowed`
+              message: 'Using RestElement in ObjectPattern is not allowed'
             })
           }
         }

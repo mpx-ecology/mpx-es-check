@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-const program = require('commander');
+const program = require('commander')
 const chalk = require('chalk')
 const pkg = require('../package.json')
 const runParseCode = require('../lib/index')
 
-let ecmaVersion = ''
+// const ecmaVersion = ''
 const log = console.log
 
 program
@@ -13,11 +13,11 @@ program
   .arguments('[ecmaVersion] [parseFiles...]')
   .option('-m, --module', 'parse code by module type', true)
   .action((ecmaVersion, parseFiles, options) => {
-    let version, esmodule, files, e
-    version = ecmaVersion || 'es5'
-    files = parseFiles.length? parseFiles : []
-    esmodule = options.module
-    
+    let e
+    const version = ecmaVersion || 'es5'
+    const files = parseFiles.length ? parseFiles : []
+    const esmodule = options.module
+
     if (!version) {
       log(chalk.red('No ecmaScript version'))
       process.exit(1)
@@ -70,14 +70,12 @@ program
     runParseCode(e, esmodule, files)
   })
 
-
 // program
-  
-  
+
 program.parse(process.argv)
 // console.log(ecmaVersion)
 // // console.log(program.args)
 
 // if (program.module) {
 //   // runParseCode()
-// } 
+// }

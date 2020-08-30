@@ -1,16 +1,16 @@
 module.exports = {
   meta: {
     docs: {
-      description: "ecma2020 rules",
+      description: 'ecma2020 rules'
     }
   },
-  create(context) {
+  create (context) {
     return {
-      CatchClause(node) {
-        if(node.param === null) {
+      CatchClause (node) {
+        if (node.param === null) {
           context.report({
             node,
-            message: `Using CatchClause param is null is not allowed`
+            message: 'Using CatchClause param is null is not allowed'
           })
         }
       }
