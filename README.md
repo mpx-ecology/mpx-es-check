@@ -1,17 +1,18 @@
-Mpx es check
+# Mpx es check
 
-### 开始使用
-#### 安装
-```js
+> check the compatibility of code after build. 
+
+## install
+```bash
 npm i mpx-es-check --save-dev
 // or
 npm i mpx-es-check -g
 ```
 
-#### 运行
+## Usage
 
-```js
+```bash
 mpx-es-check --module es6 ./dist/*.js
 ```
 
-//待补充参数
+// 待补充参数

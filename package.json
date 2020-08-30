@@ -1,8 +1,8 @@
 {
-  "name": "es-check-odin",
+  "name": "@mpxjs/es-check",
   "version": "0.0.1",
   "description": "mpx es check",
-  "main": "index.js",
+  "main": "lib/index.js",
   "bin": {
     "mpx-es-check": "./bin/mpx-es-check.js"
   },
@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "xuegan",
-  "license": "ISC",
+  "license": "Apache",
   "dependencies": {
     "glob": "^7.1.6",
     "acorn": "^8.0.1",
