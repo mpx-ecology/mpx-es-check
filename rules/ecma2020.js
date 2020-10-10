@@ -6,14 +6,18 @@ module.exports = {
   },
   create(context) {
     return {
-      CatchClause(node) {
-        if(node.param === null) {
-          context.report({
-            node,
-            message: `Using CatchClause param is null is not allowed`
-          })
+      Literal(node) {
+        let message = ''
+        if (node.bigint && node.value) {
+          message: `Using Literal value is bigint is null is not allowed`
+        } else if (node.bigint && node.value === null) {
+          message = `Using Literal value is bigint and in environments that don't support BigInt values is null is not allowed`
         }
-      }
+        context.report({
+          node,
+          message: message
+        })
+      },
     }
   }
 }
