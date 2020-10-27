@@ -10,7 +10,7 @@ module.exports = {
         if (node.param === null) {
           context.report({
             node,
-            message: 'Using CatchClause param is null is not allowed'
+            message: 'Using CatchClause param is null is not allowed, E.g., try { foo() } catch { bar() }'
           })
         }
       }
