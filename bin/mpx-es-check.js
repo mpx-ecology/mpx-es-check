@@ -48,6 +48,12 @@ program
       case 'es10':
         e = '10'
         break
+      case 'es11':
+        e = '11'
+        break
+      case 'es12':
+        e = '12'
+        break
       case 'es2015':
         e = '6'
         break
@@ -62,6 +68,12 @@ program
         break
       case 'es2019':
         e = '10'
+        break
+      case 'es2020':
+        e = '11'
+        break
+      case 'es2021':
+        e = '12'
         break
       default:
         log(chalk.red('Invalid ecmaScript version'))

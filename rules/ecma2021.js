@@ -1,7 +1,7 @@
 module.exports = {
   meta: {
     docs: {
-      description: 'ecma2019 rules'
+      description: 'ecma2021 rules'
     }
   },
   create (context) {
