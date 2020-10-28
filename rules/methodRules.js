@@ -32,7 +32,7 @@ function maybeNeedsPolyfill (path, methods, name) {
   const type = typeAnnotationToString(typeAnnotation)
   if (!type) return true;
   return methods[name].some((name) => {
-    name.split('.').some(item => item === type)
+    return name.split('.').some(item => item === type)
   })
 }
 
@@ -90,31 +90,31 @@ module.exports = {
        * @param node
        * @constructor
        */
-      CallExpression (node, path) {
-        const { callee } = node
-        if (callee.type !== 'MemberExpression') return
-
-        const { object } = callee
-        const propertyName = resolvePropertyName(
-          path.get("callee.property"),
-          callee.computed,
-        )
-
-        // 存在为转换的静态方法
-        if (hasStaticMapping(object.name, propertyName)) {
-          context.report({
-            node,
-            message: `there are static methods that are not converted..... ${object.name}.${propertyName}`
-          })
-        } else if (hasMapping(InstanceProperties, propertyName) && maybeNeedsPolyfill(path.get('callee'), InstanceProperties, propertyName)) {
-          // 如果存在疑似为实例方法的数据
-          context.report({
-            node,
-            message: `there are instance methods that are not converted..... ${object.name}.${propertyName}`,
-            type: 'warning'
-          })
-        }
-      }
+      // CallExpression (node, path) {
+      //   const { callee } = node
+      //   if (callee.type !== 'MemberExpression') return
+      //
+      //   const { object } = callee
+      //   const propertyName = resolvePropertyName(
+      //     path.get("callee.property"),
+      //     callee.computed,
+      //   )
+      //
+      //   // 存在为转换的静态方法
+      //   if (hasStaticMapping(object.name, propertyName)) {
+      //     context.report({
+      //       node,
+      //       message: `there are static methods that are not converted..... ${object.name}.${propertyName}`
+      //     })
+      //   } else if (hasMapping(InstanceProperties, propertyName) && maybeNeedsPolyfill(path.get('callee'), InstanceProperties, propertyName)) {
+      //     // 如果存在疑似为实例方法的数据
+      //     context.report({
+      //       node,
+      //       message: `there are instance methods that are not converted..... ${object.name}.${propertyName}`,
+      //       type: 'warning'
+      //     })
+      //   }
+      // }
 
     }
   }
