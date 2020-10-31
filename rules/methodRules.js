@@ -1,54 +1,53 @@
 const { StaticProperties, InstanceProperties, BuiltIns } = require('../lib/definitions')
 
-
-function has(obj, key) {
-  return Object.prototype.hasOwnProperty.call(obj, key);
+function has (obj, key) {
+  return Object.prototype.hasOwnProperty.call(obj, key)
 }
 
-function hasMapping(methods, name) {
+function hasMapping (methods, name) {
   return has(methods, name)
 }
 
-function isNamespaced(path) {
+function isNamespaced (path) {
   const binding = path.scope.getBinding(path.node.name)
   if (!binding) return false
   return binding.path.isImportNamespaceSpecifier()
 }
 
-function typeAnnotationToString(node) {
+function typeAnnotationToString (node) {
   switch (node.type) {
-    case "GenericTypeAnnotation":
+    case 'GenericTypeAnnotation':
       if (node.id && node.id.type === 'Identifier' && node.id.name === 'Array') return 'array'
-      break;
-    case "StringTypeAnnotation":
-      return "string";
+      break
+    case 'StringTypeAnnotation':
+      return 'string'
   }
 }
 
 function maybeNeedsPolyfill (path, methods, name) {
-  if (isNamespaced(path.get("object"))) return false
+  if (isNamespaced(path.get('object'))) return false
   if (!methods[name]) return true
-  const typeAnnotation = path.get("object").getTypeAnnotation()
+  const typeAnnotation = path.get('object').getTypeAnnotation()
   const type = typeAnnotationToString(typeAnnotation)
-  if (!type) return true;
+  if (!type) return true
   return methods[name].some((name) => {
     return name.split('.').some(item => item === type)
   })
 }
 
 function resolvePropertyName (path, computed) {
-  const { node } = path;
-  if (!computed) return node.name;
-  if (path.isStringLiteral()) return node.value;
-  const result = path.evaluate();
-  return result.value;
+  const { node } = path
+  if (!computed) return node.name
+  if (path.isStringLiteral()) return node.value
+  const result = path.evaluate()
+  return result.value
 }
 // 是否是静态方法
-function hasStaticMapping(object, method) {
+function hasStaticMapping (object, method) {
   return (
     has(StaticProperties, object) &&
     hasMapping(StaticProperties[object], method)
-  );
+  )
 }
 
 module.exports = {
@@ -67,8 +66,8 @@ module.exports = {
       MemberExpression (node, path) {
         const { object } = node
         const propertyName = resolvePropertyName(
-          path.get("property"),
-          node.computed,
+          path.get('property'),
+          node.computed
         )
         // 存在为转换的静态方法
         if (hasStaticMapping(object.name, propertyName)) {
@@ -92,21 +91,20 @@ module.exports = {
           })
         }
       },
-      ReferencedIdentifier (node, path) {
-        const { parent, scope } = path
+      ReferencedIdentifier (node) {
         const { name } = node
-        if (name === "regeneratorRuntime") {
+        if (name === 'regeneratorRuntime') {
           context.report({
             node,
-            message: `存在 generator 方法未被转换 `,
+            message: '存在 generator 方法未被转换 ',
             type: 'warning'
           })
-          return;
+          return
         }
         if (hasMapping(BuiltIns, name)) {
           context.report({
             node,
-            message: `there are builtIns object that are not converted: ${object.name}`,
+            message: `there are builtIns object that are not converted: ${name}`,
             type: 'warning'
           })
         }
