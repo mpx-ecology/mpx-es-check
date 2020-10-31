@@ -32,9 +32,9 @@ module.exports = {
         }
       },
       // class 中 Super 的使用
-      Super (node) {
+      Super (node, path) {
         if (node.type === 'Super') {
-          if (node.parent.type === 'CallExpression' || node.parent.type === 'MemberExpression') {
+          if (path.parent.type === 'CallExpression' || path.parent.type === 'MemberExpression') {
             context.report({
               node,
               message: 'Using Super is not allowed'
@@ -43,8 +43,8 @@ module.exports = {
         }
       },
       // 解构赋值
-      SpreadElement (node) {
-        const parentType = node.parent.type
+      SpreadElement (node, path) {
+        const parentType = path.parent.type
         if (parentType === 'ArrayExpression' || parentType === 'CallExpression' || parentType === 'NewExpression') {
           context.report({
             node,
@@ -81,8 +81,8 @@ module.exports = {
         })
       },
       // 对象赋值模式
-      ObjectPattern (node) {
-        if (node.parent.kind === 'init') {
+      ObjectPattern (node, path) {
+        if (path.parent.kind === 'init') {
           context.report({
             node,
             message: 'Using ObjectPattern(初始化赋值) is not allowed'
@@ -90,8 +90,8 @@ module.exports = {
         }
       },
       // 数组赋值模式
-      ArrayPattern (node) {
-        if (node.parent.kind === 'init') {
+      ArrayPattern (node, path) {
+        if (path.parent.kind === 'init') {
           context.report({
             node,
             message: 'Using ArrayPattern(初始化赋值) is not allowed'

@@ -1,4 +1,4 @@
-const { StaticProperties, InstanceProperties } = require('../lib/definitions')
+const { StaticProperties, InstanceProperties, BuiltIns } = require('../lib/definitions')
 
 
 function has(obj, key) {
@@ -83,8 +83,34 @@ module.exports = {
             message: `there are instance methods that are not converted..... ${object.name}.${propertyName}`,
             type: 'warning'
           })
+        } else if (hasMapping(BuiltIns, object.name)) {
+          // 如果存在疑似为内建方法的数据
+          context.report({
+            node,
+            message: `there are builtIns object that are not converted..... ${object.name}`,
+            type: 'warning'
+          })
         }
       },
+      ReferencedIdentifier (node, path) {
+        const { parent, scope } = path
+        const { name } = node
+        if (name === "regeneratorRuntime") {
+          context.report({
+            node,
+            message: `存在 generator 方法未被转换 `,
+            type: 'warning'
+          })
+          return;
+        }
+        if (hasMapping(BuiltIns, name)) {
+          context.report({
+            node,
+            message: `there are builtIns object that are not converted: ${object.name}`,
+            type: 'warning'
+          })
+        }
+      }
       /**
        * 处理方法
        * @param node
