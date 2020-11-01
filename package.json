@@ -6,6 +6,12 @@
   "bin": {
     "mpx-es-check": "./bin/mpx-es-check.js"
   },
+  "keywords": [
+    "javascript",
+    "ecmaScript",
+    "es check",
+    "compatibility"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .js ./",

@@ -79,7 +79,7 @@ module.exports = {
           // 如果存在疑似为实例方法的数据
           context.report({
             node,
-            message: `there are instance methods that are not converted..... ${object.name}.${propertyName}`,
+            message: `there are instance methods that are not converted: ${object.name}.${propertyName}`,
             type: 'warning'
           })
         } else if (hasMapping(BuiltIns, object.name)) {

@@ -13,12 +13,6 @@ module.exports = {
             message: 'Using BinaryExpression operator ** is not allowed'
           })
         }
-        if (node.operator === '*') {
-          context.report({
-            node,
-            message: 'Using BinaryExpression operator ** is not allowed'
-          })
-        }
       },
       AssignmentExpression (node) {
         if (node.operator === '**=') {
