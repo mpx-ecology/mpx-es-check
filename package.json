@@ -2,7 +2,6 @@
   "name": "mpx-es-check",
   "version": "0.0.1",
   "description": "mpx es check",
-  "main": "lib/index.js",
   "bin": {
     "mpx-es-check": "./bin/mpx-es-check.js"
   },
