@@ -1,9 +1,9 @@
 {
   "name": "mpx-es-check",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "mpx es check",
   "bin": {
-    "mpx-es-check": "./bin/mpx-es-check.js"
+    "mpx-es-check": "index.js"
   },
   "keywords": [
     "javascript",
