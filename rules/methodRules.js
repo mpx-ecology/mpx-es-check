@@ -71,6 +71,19 @@ module.exports = {
         )
         // 存在为转换的静态方法
         if (hasStaticMapping(object.name, propertyName)) {
+          if (path.parent && path.parent.type === 'IfStatement') {
+            // 如果是 if 语句判断条件中: if (Object.getOwnPropertySymbols)
+            // 则认为是正常的 polyfill 代码块
+            return true
+          }
+          if (path.scope.path.container.type === 'IfStatement') {
+            const proName = path.scope.path.container.test.property && path.scope.path.container.test.property.name
+            const objName = path.scope.path.container.test.object && path.scope.path.container.test.object.name
+            if (hasStaticMapping(objName, proName)) {
+              // 如果当前的 static method 是存在与判空 if 语句中的
+              return true
+            }
+          }
           context.report({
             node,
             message: `there are static methods that are not converted..... ${object.name}.${propertyName}`
