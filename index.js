@@ -12,11 +12,13 @@ program
   .version(pkg.version)
   .arguments('[ecmaVersion] [parseFiles...]')
   .option('-m, --module', 'parse code by module type', true)
+  .option('-a, --all', 'check code use all rules: include instance method & static method', false)
   .action((ecmaVersion, parseFiles, options) => {
     let e
     const version = ecmaVersion || 'es5'
     const files = parseFiles.length ? parseFiles : []
     const esmodule = options.module
+    const useAllRules = options.all
 
     if (!version) {
       log(chalk.red('No ecmaScript version'))
@@ -79,7 +81,7 @@ program
         log(chalk.red('Invalid ecmaScript version'))
         process.exit(1)
     }
-    runParseCode(e, esmodule, files)
+    runParseCode(e, esmodule, files, useAllRules)
   })
 
 // program
