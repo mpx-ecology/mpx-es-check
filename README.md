@@ -11,6 +11,11 @@ npm i mpx-es-check -g
 
 ## Usage
 
+如果是本地安装：在 package.json 中添加 scripts 命令
+```bash
+"esCheck": "mpx-es-check --module es6 ./dist/*.js"
+```
+如果是全局安装：可直接运行命令
 ```bash
 mpx-es-check --module es6 ./dist/*.js
 ```
@@ -20,3 +25,8 @@ mpx-es-check --module es6 ./dist/*.js
    - 所需要检测的最低版本，输入es6 表示会检测 es6及以上的所有语法
 * 检测文件
    - 设置文件匹配的范围,   somePath/*.js
+
+
+## 结果输出
+
+检测中如果有高版本语法, 则会在终端提示，并将检测结果输出到项目 ./dist/es-check.log 文件中
