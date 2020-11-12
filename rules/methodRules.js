@@ -129,8 +129,6 @@ module.exports = {
        */
       // CallExpression (node, path) {
       //   const { callee } = node
-      //   if (callee.type !== 'MemberExpression') return
-      //
       //   const { object } = callee
       //   const propertyName = resolvePropertyName(
       //     path.get("callee.property"),
