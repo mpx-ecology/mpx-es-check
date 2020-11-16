@@ -1,6 +1,6 @@
 {
   "name": "mpx-es-check",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "mpx es check",
   "bin": {
     "mpx-es-check": "index.js"
