@@ -128,14 +128,9 @@ module.exports = {
        * @constructor
        */
       CallExpression (node, path) {
-        console.log('========')
-        console.log(path.node.arguments.length);
-        console.log('--========---');
         if (path.node.arguments.length) return
-        var callee = path.node.callee;
+        const callee = path.node.callee
         if (callee.type !== 'MemberExpression') return
-
-        const { callee } = node
         const { object } = callee
         const propertyName = resolvePropertyName(
           path.get("callee.property"),

@@ -11,13 +11,14 @@ const log = console.log
 program
   .version(pkg.version)
   .arguments('[ecmaVersion] [parseFiles...]')
-  .option('-m, --module', 'parse code by module type', true)
+  .option('-m, --module', 'a modular way to parse code', 'script')
   .option('-a, --all', 'check code use all rules: include instance method & static method', false)
+  .option('-e, --ecma <version>', 'check code use all rules: include instance method & static method', 6)
   .action((ecmaVersion, parseFiles, options) => {
     let e
-    const version = ecmaVersion || 'es5'
     const files = parseFiles.length ? parseFiles : []
     const esmodule = options.module
+    let version = options.ecma || ecmaVersion || 'es6'
     const useAllRules = options.all
 
     if (!version) {
@@ -56,6 +57,36 @@ program
       case 'es12':
         e = '12'
         break
+      case '3':
+        e = '3'
+        break
+      case '4':
+        e = '4'
+        break
+      case '5':
+        e = '5'
+        break
+      case '6':
+        e = '6'
+        break
+      case '7':
+        e = '7'
+        break
+      case '8':
+        e = '8'
+        break
+      case '9':
+        e = '9'
+        break
+      case '10':
+        e = '10'
+        break
+      case '11':
+        e = '11'
+        break
+      case '12':
+        e = '12'
+        break
       case 'es2015':
         e = '6'
         break
@@ -84,12 +115,4 @@ program
     runParseCode(e, esmodule, files, useAllRules)
   })
 
-// program
-
 program.parse(process.argv)
-// console.log(ecmaVersion)
-// // console.log(program.args)
-
-// if (program.module) {
-//   // runParseCode()
-// }
