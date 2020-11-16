@@ -1,0 +1,6 @@
+WARNING:
+            there are instance methods that are not converted: arr.includes
+            at file: ./dist/test3.js
+            at startLine: 3
+            at startColumn: 0
+            
