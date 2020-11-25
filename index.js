@@ -10,11 +10,11 @@ const log = console.log
 
 program
   .version(pkg.version)
-  .arguments('[ecmaVersion] [parseFiles...]')
+  .arguments('[parseFiles...]')
   .option('-m, --module', 'a modular way to parse code', 'script')
   .option('-a, --all', 'check code use all rules: include instance method & static method', false)
   .option('-e, --ecma <version>', 'check code use all rules: include instance method & static method', 6)
-  .action((ecmaVersion, parseFiles, options) => {
+  .action((parseFiles, options) => {
     let e
     const files = parseFiles.length ? parseFiles : []
     const esmodule = options.module
