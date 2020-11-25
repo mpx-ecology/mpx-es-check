@@ -1,6 +1,12 @@
-WARNING:
-            there are instance methods that are not converted: arr.includes
-            at file: ./dist/test3.js
-            at startLine: 3
+ERROR:
+            Using const is not allowed
+            at file: ./dist/test2.js
+            at startLine: 1
+            at startColumn: 0
+            
+ERROR:
+            Using const is not allowed
+            at file: ./dist/test4.js
+            at startLine: 2
             at startColumn: 0
             
