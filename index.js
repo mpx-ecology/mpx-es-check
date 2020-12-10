@@ -4,7 +4,6 @@ const program = require('commander')
 const chalk = require('chalk')
 const pkg = require('./package.json')
 const runParseCode = require('./lib/index')
-
 // const ecmaVersion = ''
 const log = console.log
 
