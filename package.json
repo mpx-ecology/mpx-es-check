@@ -5,6 +5,7 @@
   "bin": {
     "mpx-es-check": "index.js"
   },
+  "main": "lib/index.js",
   "keywords": [
     "javascript",
     "ecmaScript",

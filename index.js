@@ -4,7 +4,6 @@ const program = require('commander')
 const chalk = require('chalk')
 const pkg = require('./package.json')
 const runParseCode = require('./lib/index')
-const { versionMap } = require('./lib/constant')
 
 const log = console.log
 
@@ -13,22 +12,23 @@ program
   .arguments('[parseFiles...]')
   .option('-m, --module', 'a modular way to parse code', 'script')
   .option('-a, --all', 'check code use all rules: include instance method & static method', false)
-  .option('-e, --ecma <version>', 'check code use all rules: include instance method & static method', 6)
+  .option('-o, --output', 'output path of result log', 'es-check.log')
+  .option('-e, --ecma <version>', 'version of rules applied', 6)
   .action((parseFiles, options) => {
     const files = parseFiles.length ? parseFiles : []
 
     const esmodule = options.module
-    const rawVersion = options.ecma || 'es6'
+    const version = options.ecma
     const useAllRules = options.all
+    const output = options.output
 
-    const version = versionMap[rawVersion]
-
-    if (!version) {
-      log(chalk.red('Invalid ecmaScript version'))
-      process.exit(1)
+    const rs = runParseCode({ version, esmodule, files, useAllRules, output })
+    if (rs.code !== 0) {
+      log(chalk.red(rs.msg))
+      process.exit(rs.code)
+    } else {
+      log(chalk.green(rs.msg))
     }
-
-    runParseCode(version, esmodule, files, useAllRules)
   })
 
 program.parse(process.argv)
