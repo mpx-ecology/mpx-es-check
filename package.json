@@ -5,6 +5,7 @@
   "bin": {
     "mpx-es-check": "index.js"
   },
+  "main": "lib/index.js",
   "keywords": [
     "javascript",
     "ecmaScript",
@@ -20,6 +21,7 @@
   "license": "Apache",
   "homepage": "https://github.com/mpx-ecology/mpx-es-check",
   "dependencies": {
+    "@babel/parser": "^7.12.3",
     "@babel/traverse": "^7.12.1",
     "chalk": "^4.1.0",
     "commander": "^6.0.0",
@@ -27,8 +29,7 @@
     "fs-extra": "^9.0.1",
     "glob": "^7.1.6",
     "lodash": "^4.17.20",
-    "single-line-log": "^1.1.2",
-    "@babel/parser": "^7.12.3"
+    "single-line-log": "^1.1.2"
   },
   "devDependencies": {
     "eslint": "^7.7.0",
