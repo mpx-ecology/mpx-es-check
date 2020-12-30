@@ -1,6 +1,6 @@
 {
   "name": "mpx-es-check",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "mpx es check",
   "bin": {
     "mpx-es-check": "index.js"
@@ -17,7 +17,7 @@
     "lint": "eslint --ext .js ./",
     "fix": "eslint --fix --ext .js ./"
   },
-  "author": "xuegan",
+  "author": "xuegan",ss
   "license": "Apache",
   "homepage": "https://github.com/mpx-ecology/mpx-es-check",
   "dependencies": {
