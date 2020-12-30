@@ -12,11 +12,10 @@ program
   .arguments('[parseFiles...]')
   .option('-m, --module', 'a modular way to parse code', 'script')
   .option('-a, --all', 'check code use all rules: include instance method & static method', false)
-  .option('-o, --output', 'output path of result log', 'es-check.log')
+  .option('-o, --output <output>', 'output path of result log', 'es-check.log')
   .option('-e, --ecma <version>', 'version of rules applied', 6)
   .action((parseFiles, options) => {
     const files = parseFiles.length ? parseFiles : []
-
     const esmodule = options.module
     const version = options.ecma
     const useAllRules = options.all
