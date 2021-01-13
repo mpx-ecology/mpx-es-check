@@ -24,6 +24,7 @@ program
     const rs = runParseCode({ version, esmodule, files, useAllRules, output })
     if (rs.code !== 0) {
       log(chalk.red(rs.msg))
+      process.exitCode = res.code
     } else {
       log(chalk.green(rs.msg))
     }
