@@ -6,7 +6,7 @@ module.exports = {
   },
   create (context) {
     return {
-      FunctionDeclaration (node) {
+      'FunctionDeclaration|ArrowFunctionExpression' (node) {
         if (node.async === true) {
           context.report({
             node,
