@@ -10,7 +10,7 @@ module.exports = {
         if (node.async === true) {
           context.report({
             node,
-            message: 'Using async function is not allowed'
+            message: 'Using async function or async arrow function is not allowed'
           })
         }
       },
