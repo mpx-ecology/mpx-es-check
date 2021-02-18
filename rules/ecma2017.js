@@ -6,11 +6,19 @@ module.exports = {
   },
   create (context) {
     return {
-      'FunctionDeclaration|ArrowFunctionExpression' (node) {
+      FunctionDeclaration (node) {
         if (node.async === true) {
           context.report({
             node,
-            message: 'Using async function or async arrow function is not allowed'
+            message: 'Using async function is not allowed'
+          })
+        }
+      },
+      ArrowFunctionExpression (node) {
+        if (node.async === true) {
+          context.report({
+            node,
+            message: 'Using async arrow function is not allowed'
           })
         }
       },
