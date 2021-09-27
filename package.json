@@ -1,6 +1,6 @@
 {
-  "name": "mpx-es-check",
-  "version": "0.0.17",
+  "name": "@mpxjs/es-check",
+  "version": "0.0.18",
   "description": "mpx es check",
   "bin": {
     "mpx-es-check": "index.js"
@@ -29,7 +29,8 @@
     "fs-extra": "^9.0.1",
     "glob": "^7.1.6",
     "lodash": "^4.17.20",
-    "single-line-log": "^1.1.2"
+    "single-line-log": "^1.1.2",
+    "source-map": "^0.7.3"
   },
   "devDependencies": {
     "eslint": "^7.7.0",

@@ -4,9 +4,9 @@
 
 ## install
 ```bash
-npm i mpx-es-check --save-dev
+npm i @mpxjs/es-check --save-dev
 // or
-npm i mpx-es-check -g
+npm i @mpxjs/es-check -g
 ```
 
 ## Usage
