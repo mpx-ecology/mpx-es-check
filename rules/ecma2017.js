@@ -14,6 +14,14 @@ module.exports = {
           })
         }
       },
+      ArrowFunctionExpression (node) {
+        if (node.async === true) {
+          context.report({
+            node,
+            message: 'Using async arrow function is not allowed'
+          })
+        }
+      },
       AwaitExpression (node) {
         if (node.operator === '**=') {
           context.report({
