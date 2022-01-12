@@ -92,8 +92,8 @@ module.exports = {
         if (callee.type !== 'MemberExpression') return
         const { object } = callee
         const propertyName = resolvePropertyName(
-          path.get("callee.property"),
-          callee.computed,
+          path.get('callee.property'),
+          callee.computed
         )
 
         // 存在为转换的静态方法
