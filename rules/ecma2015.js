@@ -1,3 +1,5 @@
+const caniuse = require('./caniuse')
+
 module.exports = {
   meta: {
     docs: {
@@ -6,13 +8,20 @@ module.exports = {
   },
   create (context) {
     return {
-      VariableDeclaration (node) {
+      VariableDeclaration (node, path, config) {
         if (node.kind === 'let' || node.kind === 'const') {
-          context.report({
-            node,
-            loc: { start: node.start, end: node.end },
-            message: `Using ${node.kind} is not allowed`
-          })
+          const report = () => {
+            context.report({
+              node,
+              loc: { start: node.start, end: node.end },
+              message: `Using ${node.kind} is not allowed`
+            })
+          }
+          if (config) {
+            caniuse('let|const', config, report)
+          } else {
+            report()
+          }
         }
       },
       FunctionDeclaration (node) {

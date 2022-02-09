@@ -68,7 +68,7 @@ module.exports = {
         if (name === 'regeneratorRuntime') {
           context.report({
             node,
-            message: '存在 generator 方法未被转换 ',
+            message: '存在 generator 方法未被转换',
             type: 'warning'
           })
           return
