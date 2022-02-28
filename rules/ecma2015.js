@@ -142,7 +142,7 @@ module.exports = function (usePlugin) {
         },
         // class body method
         MethodDefinition (node) {
-          if (usePlugin.has('classes')) {
+          if (node.key.type === 'Identifier' && usePlugin.has('classes')) {
             context.report({
               node,
               message: 'Using MethodDefinition(class 方法) is not allowed'

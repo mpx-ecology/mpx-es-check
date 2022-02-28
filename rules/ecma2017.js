@@ -24,10 +24,10 @@ module.exports = function (usePlugin) {
           }
         },
         AwaitExpression (node) {
-          if (usePlugin.has('async-to-generator') && usePlugin.has('regenerator-transform')) {
+          if (node.argument.type === 'CallExpression' && usePlugin.has('async-to-generator')) {
             context.report({
               node,
-              message: 'Using await is not allowed'
+              message: 'Using await xxx() is not allowed'
             })
           }
         }
