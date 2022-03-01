@@ -23,7 +23,7 @@
   "dependencies": {
     "@babel/core": "^7.17.5",
     "@babel/preset-env": "^7.16.11",
-    "acorn": "^7.4.1",
+    "acorn": "^8.7.0",
     "chalk": "^4.1.0",
     "commander": "^6.0.0",
     "core-js-compat": "^3.21.1",
