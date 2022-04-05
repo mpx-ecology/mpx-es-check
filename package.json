@@ -22,7 +22,9 @@
   "homepage": "https://github.com/mpx-ecology/mpx-es-check",
   "dependencies": {
     "@babel/core": "^7.17.5",
+    "@babel/parser": "^7.17.8",
     "@babel/preset-env": "^7.16.11",
+    "@babel/traverse": "^7.17.3",
     "acorn": "^8.7.0",
     "chalk": "^4.1.0",
     "commander": "^6.0.0",

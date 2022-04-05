@@ -43,14 +43,53 @@ function resolvePropertyName (path, computed) {
   return result.value
 }
 // 是否是静态方法
-function hasStaticMapping (object, method) {
+function hasStaticMapping (filedStaticPros, object, method) {
   return (
-    has(StaticProperties, object) &&
-    hasMapping(StaticProperties[object], method)
+    has(filedStaticPros, object) &&
+    hasMapping(filedStaticPros[object], method)
   )
 }
 
+function filterData (target, list) {
+  // TODO 该方法的实现待优化
+  const filtered = {}
+  Object.keys(target).forEach(key => {
+    filtered[key] = []
+    if (Array.isArray(target[key])) {
+      target[key].forEach(item => {
+        if (list.includes(item)) {
+          filtered[key].push(item)
+        }
+      })
+    } else {
+      filtered[key] = {}
+      Object.keys(target[key]).forEach(item => {
+        const res = target[key][item]
+        if (typeof res === 'string') {
+          if (list.includes(res)) {
+            filtered[key][item] = res
+          }
+        } else {
+          const temp = []
+          res.forEach(sub => {
+            if (list.includes(sub)) {
+              temp.push(sub)
+            }
+          })
+          if (temp.length) {
+            filtered[key][item] = [...temp]
+          }
+        }
+      })
+    }
+  })
+  return filtered
+}
+
 module.exports = function (list) {
+  const filteredInstancePros = filterData(InstanceProperties, list)
+  const filteredStaticPros = filterData(StaticProperties, list)
+  const filedBuiltIns = filterData(BuiltIns, list)
   return {
     meta: {
       docs: {
@@ -74,7 +113,7 @@ module.exports = function (list) {
             })
             return
           }
-          if (hasMapping(BuiltIns, name)) {
+          if (hasMapping(filedBuiltIns, name)) {
             context.report({
               node,
               message: `there are builtIns object that are not converted: ${name}`,
@@ -98,7 +137,7 @@ module.exports = function (list) {
           )
 
           // 存在为转换的静态方法
-          if (hasStaticMapping(object.name, propertyName)) {
+          if (hasStaticMapping(filteredStaticPros, object.name, propertyName)) {
             if (path.parent && path.parent.type === 'IfStatement') {
               // 如果是 if 语句判断条件中: if (Object.getOwnPropertySymbols)
               // 则认为是正常的 polyfill 代码块
@@ -107,7 +146,7 @@ module.exports = function (list) {
             if (path.scope.path.container.type === 'IfStatement') {
               const proName = path.scope.path.container.test.property && path.scope.path.container.test.property.name
               const objName = path.scope.path.container.test.object && path.scope.path.container.test.object.name
-              if (hasStaticMapping(objName, proName)) {
+              if (hasStaticMapping(filteredStaticPros, objName, proName)) {
                 // 如果当前的 static method 是存在与判空 if 语句中的
                 return true
               }
@@ -116,14 +155,17 @@ module.exports = function (list) {
               node,
               message: `there are static methods that are not converted..... ${object.name}.${propertyName}`
             })
-          } else if (hasMapping(InstanceProperties, propertyName) && maybeNeedsPolyfill(memberExpressionCallee, InstanceProperties, propertyName)) {
+          } else if (
+            hasMapping(filteredInstancePros, propertyName) &&
+            maybeNeedsPolyfill(memberExpressionCallee, filteredInstancePros, propertyName)
+          ) {
             // 如果存在疑似为实例方法的数据
             context.report({
               node,
               message: `there are instance methods that are not converted: ${object.name}.${propertyName}`,
               type: 'warning'
             })
-          } else if (hasMapping(BuiltIns, object.name)) {
+          } else if (hasMapping(filedBuiltIns, object.name)) {
             // 如果存在疑似为内建方法的数据
             context.report({
               node,
