@@ -54,20 +54,28 @@ function filterData (target, list) {
   // TODO 该方法的实现待优化
   const filtered = {}
   Object.keys(target).forEach(key => {
-    filtered[key] = []
     if (Array.isArray(target[key])) {
+      const temp = []
       target[key].forEach(item => {
         if (list.includes(item)) {
-          filtered[key].push(item)
+          temp.push(item)
         }
       })
+      if (temp.length) {
+        filtered[key] = temp
+      }
     } else {
       filtered[key] = {}
       Object.keys(target[key]).forEach(item => {
         const res = target[key][item]
         if (typeof res === 'string') {
+          let temp = ''
           if (list.includes(res)) {
             filtered[key][item] = res
+            temp = res
+          }
+          if (temp) {
+            filtered[key][item] = temp
           }
         } else {
           const temp = []
