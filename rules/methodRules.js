@@ -94,7 +94,7 @@ function filterData (target, list) {
   return filtered
 }
 
-module.exports = function (list) {
+module.exports = function (list = []) {
   const filteredInstancePros = filterData(InstanceProperties, list)
   const filteredStaticPros = filterData(StaticProperties, list)
   const filedBuiltIns = filterData(BuiltIns, list)

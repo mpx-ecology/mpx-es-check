@@ -1,4 +1,4 @@
-module.exports = function (usePlugin) {
+module.exports = function (usePlugin = new Map()) {
   return {
     meta: {
       docs: {
