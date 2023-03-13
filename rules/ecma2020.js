@@ -39,6 +39,14 @@ module.exports = function (usePlugin) {
             })
           }
         },
+        ChainExpression (node) { // plugin模式，使用的acorn解析，可选链结构类型是 ChainExpression
+          if (usePlugin('optional-chaining')) {
+            context.report({
+              node,
+              message: 'there has ChainExpression node，such as a?.b || a?.b.c || a.b?.c || a?.b?.c'
+            })
+          }
+        },
         /**
          * import 表达式 例如：var a = import('b')
          * @param node
