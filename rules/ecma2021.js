@@ -1,4 +1,4 @@
-module.exports = function (usePlugin = new Map()) {
+module.exports = function (usePlugin) {
   return {
     meta: {
       docs: {
@@ -14,7 +14,7 @@ module.exports = function (usePlugin = new Map()) {
          */
         AssignmentExpression (node) {
           if (node.operator === '||=' || node.operator === '??=' || node.operator === '&&=') {
-            if (usePlugin.has('logical-assignment-operators')) {
+            if (usePlugin('logical-assignment-operators')) {
               context.report({
                 node,
                 message: `使用的赋值运算符 ${node.operator} 浏览器暂不支持，需要走 babel 转译`

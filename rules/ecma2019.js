@@ -1,4 +1,4 @@
-module.exports = function (usePlugin = new Map()) {
+module.exports = function (usePlugin) {
   return {
     meta: {
       docs: {
@@ -8,7 +8,7 @@ module.exports = function (usePlugin = new Map()) {
     create (context) {
       return {
         CatchClause (node) {
-          if (node.param === null && usePlugin.has('optional-catch-binding')) {
+          if (node.param === null && usePlugin('optional-catch-binding')) {
             context.report({
               node,
               message: 'Using CatchClause param is null is not allowed, E.g., try { foo() } catch { bar() }'
