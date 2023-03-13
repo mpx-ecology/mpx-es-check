@@ -31,7 +31,7 @@ module.exports = function (usePlugin = new Map()) {
          * @param node
          * @constructor
          */
-        ChainExpression (node) {
+        OptionalMemberExpression (node) {
           if (usePlugin.has('optional-chaining')) {
             context.report({
               node,
