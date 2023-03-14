@@ -8,7 +8,7 @@ module.exports = function (usePlugin = new Map()) {
     create (context) {
       return {
         FunctionDeclaration (node) {
-          if (node.async === true && usePlugin.has('async-to-generator')) {
+          if (node.async === true && usePlugin('async-to-generator')) {
             context.report({
               node,
               message: 'Using async function is not allowed'
@@ -16,7 +16,7 @@ module.exports = function (usePlugin = new Map()) {
           }
         },
         ArrowFunctionExpression (node) {
-          if (node.async === true && usePlugin.has('async-to-generator')) {
+          if (node.async === true && usePlugin('async-to-generator')) {
             context.report({
               node,
               message: 'Using async arrow function is not allowed'
@@ -24,7 +24,7 @@ module.exports = function (usePlugin = new Map()) {
           }
         },
         AwaitExpression (node) {
-          if (node.argument.type === 'CallExpression' && usePlugin.has('async-to-generator')) {
+          if (node.argument.type === 'CallExpression' && usePlugin('async-to-generator')) {
             context.report({
               node,
               message: 'Using await xxx() is not allowed'

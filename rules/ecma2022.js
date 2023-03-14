@@ -1,4 +1,4 @@
-module.exports = function (usePlugin = new Map()) {
+module.exports = function (usePlugin) {
   return {
     meta: {
       docs: {
@@ -10,7 +10,7 @@ module.exports = function (usePlugin = new Map()) {
         // class 私有属性/方法
         PropertyDefinition (node) {
           if (node.key.type === 'PrivateIdentifier') {
-            if (usePlugin.has('class-properties') && usePlugin.has('classes')) {
+            if (usePlugin('class-properties') && usePlugin('classes')) {
               context.report({
                 node,
                 message: 'using private variable in class is not allow'
@@ -19,7 +19,7 @@ module.exports = function (usePlugin = new Map()) {
           }
         },
         MethodDefinition (node) {
-          if (!usePlugin.has('class-properties') || !usePlugin.has('classes')) return
+          if (!usePlugin('class-properties') || !usePlugin('classes')) return
           const handle = []
           if (node.kind === 'get' || node.kind === 'set') {
             handle.push(node.kind)
@@ -39,7 +39,7 @@ module.exports = function (usePlugin = new Map()) {
         },
         AwaitExpression (node) {
           // await import ('/xxx')
-          if (node.argument.type === 'ImportExpression' && usePlugin.has('modules-commonjs')) {
+          if (node.argument.type === 'ImportExpression' && usePlugin('modules-commonjs')) {
             context.report({
               node,
               message: 'using await import("./xxx") is not allow'

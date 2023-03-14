@@ -1,4 +1,4 @@
-module.exports = function (usePlugin = new Map()) {
+module.exports = function (usePlugin) {
   return {
     meta: {
       docs: {
@@ -31,8 +31,16 @@ module.exports = function (usePlugin = new Map()) {
          * @param node
          * @constructor
          */
-        ChainExpression (node) {
-          if (usePlugin.has('optional-chaining')) {
+        OptionalMemberExpression (node) {
+          if (usePlugin('optional-chaining')) {
+            context.report({
+              node,
+              message: 'there has ChainExpression node，such as a?.b || a?.b.c || a.b?.c || a?.b?.c'
+            })
+          }
+        },
+        ChainExpression (node) { // plugin模式，使用的acorn解析，可选链结构类型是 ChainExpression
+          if (usePlugin('optional-chaining')) {
             context.report({
               node,
               message: 'there has ChainExpression node，such as a?.b || a?.b.c || a.b?.c || a?.b?.c'
@@ -45,7 +53,7 @@ module.exports = function (usePlugin = new Map()) {
          * @constructor
          */
         ImportExpression (node) {
-          if (usePlugin.has('modules-commonjs')) { // && arrow-functions
+          if (usePlugin('modules-commonjs')) { // && arrow-functions
             context.report({
               node,
               message: 'there has ImportExpression node，such as var a = import("b")'
@@ -58,7 +66,7 @@ module.exports = function (usePlugin = new Map()) {
          * @constructor
          */
         LogicalExpression (node) {
-          if (node.operator === '??' && usePlugin.has('nullish-coalescing-operator')) {
+          if (node.operator === '??' && usePlugin('nullish-coalescing-operator')) {
             context.report({
               node,
               message: 'The operator property of the LogicalExpression node can be "??", such as var a = "1 ?? 2"'
@@ -82,7 +90,7 @@ module.exports = function (usePlugin = new Map()) {
          * @constructor
          */
         ExportAllDeclaration (node) {
-          if (usePlugin.has('modules-commonjs')) {
+          if (usePlugin('modules-commonjs')) {
             context.report({
               node,
               message: 'The exported property contains an Identifier when a different exported name is specified using as, e.g., export * as foo from "mod"'

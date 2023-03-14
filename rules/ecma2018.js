@@ -1,4 +1,4 @@
-module.exports = function (usePlugin = new Map()) {
+module.exports = function (usePlugin) {
   return {
     meta: {
       docs: {
@@ -8,7 +8,7 @@ module.exports = function (usePlugin = new Map()) {
     create (context) {
       return {
         ForOfStatement (node) {
-          if (node.await === true && usePlugin.has('async-generator-functions')) {
+          if (node.await === true && usePlugin('async-generator-functions')) {
             context.report({
               node,
               message: 'Using for_await_of is not allowed'
@@ -29,7 +29,7 @@ module.exports = function (usePlugin = new Map()) {
                 hasSpreadElement = true
               }
             }
-            if (hasSpreadElement && usePlugin.has('object-rest-spread')) {
+            if (hasSpreadElement && usePlugin('object-rest-spread')) {
               context.report({
                 node,
                 message: 'Using hasSpreadElement in ObjectExpression is not allowed'
@@ -38,7 +38,7 @@ module.exports = function (usePlugin = new Map()) {
           }
         },
         TemplateElement (node) {
-          if (node.value && node.value.cooked === null && usePlugin.has('template-literals')) {
+          if (node.value && node.value.cooked === null && usePlugin('template-literals')) {
             context.report({
               node,
               message: 'Using TemplateElement has cooked null is not allowed'
@@ -54,7 +54,7 @@ module.exports = function (usePlugin = new Map()) {
                 hasRestElement = true
               }
             }
-            if (hasRestElement && usePlugin.has('destructuring')) {
+            if (hasRestElement && usePlugin('destructuring')) {
               context.report({
                 node,
                 message: 'Using RestElement in ObjectPattern is not allowed'

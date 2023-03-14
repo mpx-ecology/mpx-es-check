@@ -1,4 +1,4 @@
-module.exports = function (usePlugin = new Map()) {
+module.exports = function (usePlugin) {
   return {
     meta: {
       docs: {
@@ -8,7 +8,7 @@ module.exports = function (usePlugin = new Map()) {
     create (context) {
       return {
         BinaryExpression (node) {
-          if (node.operator === '**' && usePlugin.has('exponentiation-operator')) {
+          if (node.operator === '**' && usePlugin('exponentiation-operator')) {
             context.report({
               node,
               message: 'Using BinaryExpression operator ** is not allowed'
@@ -16,7 +16,7 @@ module.exports = function (usePlugin = new Map()) {
           }
         },
         AssignmentExpression (node) {
-          if (node.operator === '**=' && usePlugin.has('exponentiation-operator')) {
+          if (node.operator === '**=' && usePlugin('exponentiation-operator')) {
             context.report({
               node,
               message: 'Using AssignmentExpression operator **= is not allowed'
