@@ -21,7 +21,7 @@ module.exports = function (usePlugin) {
                      *   a: String
                      * }
                      */
-                    if (!['String', 'Number', 'Boolean', 'Object', 'Array'].includes(compPropertyValue.name)) {
+                    if (!['String', 'Number', 'Boolean', 'Object', 'Array', 'Function'].includes(compPropertyValue.name)) {
                       context.report({
                         node,
                         message: `There are some properties that are not supported by the earlier version of wechat miniprogram base library..... ${compProperty.key.name}`
