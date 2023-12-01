@@ -10,10 +10,12 @@ module.exports = function (usePlugin) {
         ObjectExpression (node) {
           if (node.properties && node.properties.length) {
             node.properties.forEach(property => {
-              if (property.key.name === 'properties') {
+              if (property.key && property.key.name === 'properties') {
                 const compProperties = property.value.properties
+                if (!compProperties) return
                 compProperties.forEach(compProperty => {
                   const compPropertyValue = compProperty.value
+                  if (!compPropertyValue) return
                   if (compPropertyValue.type === 'Identifier') {
                     /**
                      * // 当声明小程序属性为以下形式
