@@ -31,7 +31,8 @@ mpx-es-check --module --ecma=6 ./dist/*.js
    ```js
    mpx-es-check --module --ecma=6 --all ./dist/*.js
    ```
-
+* --miniprogram 检测微信小程序语法错误
+  * 检测微信小程序中的props声明错误等
 ## 结果输出
 
 检测中如果有高版本语法, 则会在终端提示，并将检测结果输出到项目 ./dist/es-check.log 文件中, 如果没有 dist 文件夹，则会在项目根目录输出 log 文件
