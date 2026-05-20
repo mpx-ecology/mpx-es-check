@@ -1,4 +1,6 @@
-module.exports = function (usePlugin) {
+import type { Rule, ASTNode } from '../types'
+
+export default function (usePlugin: (name: string) => boolean): Rule {
   return {
     meta: {
       docs: {
@@ -7,7 +9,7 @@ module.exports = function (usePlugin) {
     },
     create (context) {
       return {
-        ForOfStatement (node) {
+        ForOfStatement (node: ASTNode) {
           if (node.await === true && usePlugin('async-generator-functions')) {
             context.report({
               node,
@@ -15,16 +17,11 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // {a: 1, ...obj, b: 2}
-        ObjectExpression (node) {
-          /**
-           * extend interface ObjectExpression {
-              properties: [ Property | SpreadElement ];
-          }
-           */
-          if (node.properties && node.properties.length) {
+        ObjectExpression (node: ASTNode) {
+          const properties = node.properties as Array<{ type: string }> | undefined
+          if (properties && properties.length) {
             let hasSpreadElement = false
-            for (const property of node.properties) {
+            for (const property of properties) {
               if (property.type === 'SpreadElement') {
                 hasSpreadElement = true
               }
@@ -37,19 +34,20 @@ module.exports = function (usePlugin) {
             }
           }
         },
-        TemplateElement (node) {
-          if (node.value && node.value.cooked === null && usePlugin('template-literals')) {
+        TemplateElement (node: ASTNode) {
+          const value = node.value as { cooked?: unknown } | undefined
+          if (value && value.cooked === null && usePlugin('template-literals')) {
             context.report({
               node,
               message: 'Using TemplateElement has cooked null is not allowed'
             })
           }
         },
-        // {a, ...rest} = obj
-        ObjectPattern (node) {
-          if (node.properties && node.properties.length) {
+        ObjectPattern (node: ASTNode) {
+          const properties = node.properties as Array<{ type: string }> | undefined
+          if (properties && properties.length) {
             let hasRestElement = false
-            for (const property of node.properties) {
+            for (const property of properties) {
               if (property.type === 'hasRestElement') {
                 hasRestElement = true
               }

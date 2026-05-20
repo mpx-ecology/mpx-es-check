@@ -1,32 +1,30 @@
-// @flow
-
-const ArrayNatureIterators = [
+const ArrayNatureIterators: string[] = [
   'es.array.iterator',
   'web.dom-collections.iterator'
 ]
 
-const CommonIterators = ['es.string.iterator', ...ArrayNatureIterators]
+const CommonIterators: string[] = ['es.string.iterator', ...ArrayNatureIterators]
 
-const ArrayNatureIteratorsWithTag = [
+const ArrayNatureIteratorsWithTag: string[] = [
   'es.object.to-string',
   ...ArrayNatureIterators
 ]
 
-const CommonIteratorsWithTag = ['es.object.to-string', ...CommonIterators]
+const CommonIteratorsWithTag: string[] = ['es.object.to-string', ...CommonIterators]
 
-const TypedArrayStaticMethods = {
+const TypedArrayStaticMethods: Record<string, string> = {
   from: 'es.typed-array.from',
   of: 'es.typed-array.of'
 }
 
-const PromiseDependencies = ['es.promise', 'es.object.to-string']
+const PromiseDependencies: string[] = ['es.promise', 'es.object.to-string']
 
-const PromiseDependenciesWithIterators = [
+const PromiseDependenciesWithIterators: string[] = [
   ...PromiseDependencies,
   ...CommonIterators
 ]
 
-const MapDependencies = [
+const MapDependencies: string[] = [
   'es.map',
   'esnext.map.delete-all',
   'esnext.map.every',
@@ -44,7 +42,7 @@ const MapDependencies = [
   ...CommonIteratorsWithTag
 ]
 
-const SetDependencies = [
+const SetDependencies: string[] = [
   'es.set',
   'esnext.set.add-all',
   'esnext.set.delete-all',
@@ -65,20 +63,20 @@ const SetDependencies = [
   ...CommonIteratorsWithTag
 ]
 
-const WeakMapDependencies = [
+const WeakMapDependencies: string[] = [
   'es.weak-map',
   'esnext.weak-map.delete-all',
   ...CommonIteratorsWithTag
 ]
 
-const WeakSetDependencies = [
+const WeakSetDependencies: string[] = [
   'es.weak-set',
   'esnext.weak-set.add-all',
   'esnext.weak-set.delete-all',
   ...CommonIteratorsWithTag
 ]
 
-const TypedArrayDependencies = [
+const TypedArrayDependencies: string[] = [
   'es.typed-array.copy-within',
   'es.typed-array.every',
   'es.typed-array.fill',
@@ -107,15 +105,15 @@ const TypedArrayDependencies = [
   'es.array-buffer.slice'
 ]
 
-const SymbolDependencies = [
+const SymbolDependencies: string[] = [
   'es.symbol',
   'es.symbol.description',
   'es.object.to-string'
 ]
 
-const URLSearchParamsDependencies = ['web.url', ...CommonIteratorsWithTag]
+const URLSearchParamsDependencies: string[] = ['web.url', ...CommonIteratorsWithTag]
 
-const BuiltIns = {
+export const BuiltIns: Record<string, string[]> = {
   AggregateError: ['esnext.aggregate-error', ...CommonIterators],
   ArrayBuffer: [
     'es.array-buffer.constructor',
@@ -165,7 +163,7 @@ const BuiltIns = {
   setImmediate: ['web.immediate']
 }
 
-const InstanceProperties = {
+export const InstanceProperties: Record<string, string[]> = {
   at: ['esnext.string.at'],
   anchor: ['es.string.anchor'],
   big: ['es.string.big'],
@@ -214,54 +212,23 @@ const InstanceProperties = {
   trimRight: ['es.string.trim-end'],
   trimStart: ['es.string.trim-start'],
   values: ArrayNatureIteratorsWithTag
-  // __defineGetter__: ['es.object.define-getter'],
-  // __defineSetter__: ['es.object.define-setter'],
-  // __lookupGetter__: ['es.object.lookup-getter'],
-  // __lookupSetter__: ['es.object.lookup-setter'],
 }
 
-const StaticProperties = {
+export const StaticProperties: Record<string, Record<string, string | string[]>> = {
   Array: {
     from: ['es.array.from', 'es.string.iterator'],
-    // isArray: ['es.array.is-array'], ECMAScript 5.1 (ECMA-262)
     of: ['es.array.of']
   },
-  // ECMAScript 5.1
-  // Date: {
-  //   now: 'es.date.now'
-  // },
 
   Object: {
     assign: 'es.object.assign',
     create: 'es.object.create',
-    // ECMAScript 5.1 (ECMA-262)
-    // defineProperty: 'es.object.define-property',
     defineProperties: 'es.object.define-properties',
     entries: 'es.object.entries',
-    // ECMAScript 5.1 (ECMA-262)
-    // freeze: 'es.object.freeze',
     fromEntries: ['es.object.from-entries', 'es.array.iterator'],
-    // ECMAScript 5.1 (ECMA-262)
-    // getOwnPropertyDescriptor: 'es.object.get-own-property-descriptor',
     getOwnPropertyDescriptors: 'es.object.get-own-property-descriptors',
-    // ECMAScript 5.1 (ECMA-262)
-    // getOwnPropertyNames: 'es.object.get-own-property-names',
     getOwnPropertySymbols: 'es.symbol',
-    // ECMAScript 5.1 (ECMA-262)
-    // getPrototypeOf: 'es.object.get-prototype-of',
     is: 'es.object.is',
-    // ECMAScript 5.1 (ECMA-262)
-    // isExtensible: 'es.object.is-extensible',
-    // ECMAScript 5.1 (ECMA-262)
-    // isFrozen: 'es.object.is-frozen',
-    // ECMAScript 5.1 (ECMA-262)
-    // isSealed: 'es.object.is-sealed',
-    // ECMAScript 5.1 (ECMA-262)
-    // keys: 'es.object.keys',
-    // ECMAScript 5.1 (ECMA-262)
-    // preventExtensions: 'es.object.prevent-extensions',
-    // ECMAScript 5.1 (ECMA-262)
-    // seal: 'es.object.seal',
     setPrototypeOf: 'es.object.set-prototype-of',
     values: 'es.object.values'
   },
@@ -418,7 +385,7 @@ const StaticProperties = {
   Float64Array: TypedArrayStaticMethods
 }
 
-const CommonInstanceDependencies = new Set([
+export const CommonInstanceDependencies = new Set<string>([
   'es.object.to-string',
   'es.object.define-getter',
   'es.object.define-setter',
@@ -427,19 +394,11 @@ const CommonInstanceDependencies = new Set([
   'es.regexp.exec'
 ])
 
-const PossibleGlobalObjects = new Set([
+export const PossibleGlobalObjects = new Set<string>([
   'global',
   'globalThis',
   'self',
   'window'
 ])
 
-module.exports = {
-  CommonIterators,
-  PossibleGlobalObjects,
-  CommonInstanceDependencies,
-  StaticProperties,
-  InstanceProperties,
-  BuiltIns,
-  PromiseDependencies
-}
+export { CommonIterators, PromiseDependencies }

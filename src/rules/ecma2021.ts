@@ -1,4 +1,6 @@
-module.exports = function (usePlugin) {
+import type { Rule, ASTNode } from '../types'
+
+export default function (usePlugin: (name: string) => boolean): Rule {
   return {
     meta: {
       docs: {
@@ -7,17 +9,12 @@ module.exports = function (usePlugin) {
     },
     create (context) {
       return {
-        /**
-         * AssignmentExpression node has short-circuiting behavior if the operator property is any of "||=","&&=", and "??=".
-         * @param node
-         * @constructor
-         */
-        AssignmentExpression (node) {
+        AssignmentExpression (node: ASTNode) {
           if (node.operator === '||=' || node.operator === '??=' || node.operator === '&&=') {
             if (usePlugin('logical-assignment-operators')) {
               context.report({
                 node,
-                message: `使用的赋值运算符 ${node.operator} 浏览器暂不支持，需要走 babel 转译`
+                message: `使用的赋值运算符 ${node.operator as string} 浏览器暂不支持，需要走 babel 转译`
               })
             }
           }

@@ -1,4 +1,6 @@
-module.exports = function (usePlugin) {
+import type { Rule, ASTNode } from '../types'
+
+export default function (usePlugin: (name: string) => boolean): Rule {
   return {
     meta: {
       docs: {
@@ -7,7 +9,7 @@ module.exports = function (usePlugin) {
     },
     create (context) {
       return {
-        BinaryExpression (node) {
+        BinaryExpression (node: ASTNode) {
           if (node.operator === '**' && usePlugin('exponentiation-operator')) {
             context.report({
               node,
@@ -15,7 +17,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        AssignmentExpression (node) {
+        AssignmentExpression (node: ASTNode) {
           if (node.operator === '**=' && usePlugin('exponentiation-operator')) {
             context.report({
               node,

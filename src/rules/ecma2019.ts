@@ -1,4 +1,6 @@
-module.exports = function (usePlugin) {
+import type { Rule, ASTNode } from '../types'
+
+export default function (usePlugin: (name: string) => boolean): Rule {
   return {
     meta: {
       docs: {
@@ -7,7 +9,7 @@ module.exports = function (usePlugin) {
     },
     create (context) {
       return {
-        CatchClause (node) {
+        CatchClause (node: ASTNode) {
           if (node.param === null && usePlugin('optional-catch-binding')) {
             context.report({
               node,

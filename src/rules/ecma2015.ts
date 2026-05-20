@@ -1,4 +1,6 @@
-module.exports = function (usePlugin) {
+import type { Rule, ASTNode } from '../types'
+
+export default function (usePlugin: (name: string) => boolean): Rule {
   return {
     meta: {
       docs: {
@@ -7,18 +9,18 @@ module.exports = function (usePlugin) {
     },
     create (context) {
       return {
-        VariableDeclaration (node) {
+        VariableDeclaration (node: ASTNode) {
           if (node.kind === 'let' || node.kind === 'const') {
             if (usePlugin('block-scoping')) {
               context.report({
                 node,
                 loc: { start: node.start, end: node.end },
-                message: `Using ${node.kind} is not allowed`
+                message: `Using ${node.kind as string} is not allowed`
               })
             }
           }
         },
-        FunctionDeclaration (node) {
+        FunctionDeclaration (node: ASTNode) {
           if (node.generator === true) {
             if (usePlugin('regenerator-transform')) {
               context.report({
@@ -28,7 +30,7 @@ module.exports = function (usePlugin) {
             }
           }
         },
-        ForOfStatement (node) {
+        ForOfStatement (node: ASTNode) {
           if (node.type === 'ForOfStatement') {
             if (usePlugin('for-of')) {
               context.report({
@@ -38,10 +40,10 @@ module.exports = function (usePlugin) {
             }
           }
         },
-        // class 中 Super 的使用
-        Super (node, path) {
+        Super (node: ASTNode, path: unknown) {
           if (node.type === 'Super') {
-            if ((path.parent.type === 'CallExpression' || path.parent.type === 'MemberExpression') && usePlugin('classes')) {
+            const p = path as { parent?: { type?: string } }
+            if ((p.parent?.type === 'CallExpression' || p.parent?.type === 'MemberExpression') && usePlugin('classes')) {
               context.report({
                 node,
                 message: 'Using Super is not allowed'
@@ -49,9 +51,9 @@ module.exports = function (usePlugin) {
             }
           }
         },
-        // 解构赋值
-        SpreadElement (node, path) {
-          const parentType = path.parent.type
+        SpreadElement (node: ASTNode, path: unknown) {
+          const p = path as { parent?: { type?: string } }
+          const parentType = p.parent?.type
           if ((parentType === 'ArrayExpression' || parentType === 'CallExpression' || parentType === 'NewExpression') && usePlugin('spread')) {
             context.report({
               node,
@@ -59,8 +61,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // 箭头函数
-        ArrowFunctionExpression (node) {
+        ArrowFunctionExpression (node: ASTNode) {
           if (usePlugin('arrow-functions')) {
             context.report({
               node,
@@ -68,8 +69,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // yield 表达式
-        YieldExpression (node) {
+        YieldExpression (node: ASTNode) {
           if (usePlugin('async-generator-functions')) {
             context.report({
               node,
@@ -77,8 +77,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // 模版文字
-        TemplateLiteral (node) {
+        TemplateLiteral (node: ASTNode) {
           if (usePlugin('template-literals')) {
             context.report({
               node,
@@ -86,8 +85,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // 标签模版语法字符串 flag
-        TaggedTemplateExpression (node) {
+        TaggedTemplateExpression (node: ASTNode) {
           if (usePlugin('template-literals')) {
             context.report({
               node,
@@ -95,26 +93,25 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // 对象赋值模式
-        ObjectPattern (node, path) {
-          if (path.parent.kind === 'init' && usePlugin('object-rest-spread')) {
+        ObjectPattern (node: ASTNode, path: unknown) {
+          const p = path as { parent?: { kind?: string } }
+          if (p.parent?.kind === 'init' && usePlugin('object-rest-spread')) {
             context.report({
               node,
               message: 'Using ObjectPattern(初始化赋值) is not allowed'
             })
           }
         },
-        // 数组赋值模式
-        ArrayPattern (node, path) {
-          if (path.parent.kind === 'init' && usePlugin('spread')) {
+        ArrayPattern (node: ASTNode, path: unknown) {
+          const p = path as { parent?: { kind?: string } }
+          if (p.parent?.kind === 'init' && usePlugin('spread')) {
             context.report({
               node,
               message: 'Using ArrayPattern(初始化赋值) is not allowed'
             })
           }
         },
-        // 解构初始化赋值 [a, ...rest] = [10, 20, 30, 40, 50]
-        RestElement (node) {
+        RestElement (node: ASTNode) {
           if (usePlugin('destructuring')) {
             context.report({
               node,
@@ -122,8 +119,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // 表达式初始化赋值 function a(b = 1) {}
-        AssignmentPattern (node) {
+        AssignmentPattern (node: ASTNode) {
           if (usePlugin('parameters')) {
             context.report({
               node,
@@ -131,8 +127,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // class body 检测
-        ClassBody (node) {
+        ClassBody (node: ASTNode) {
           if (usePlugin('classes')) {
             context.report({
               node,
@@ -140,16 +135,16 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // class body method
-        MethodDefinition (node) {
-          if (node.key.type === 'Identifier' && usePlugin('classes')) {
+        MethodDefinition (node: ASTNode) {
+          const key = node.key as { type?: string } | undefined
+          if (key?.type === 'Identifier' && usePlugin('classes')) {
             context.report({
               node,
               message: 'Using MethodDefinition(class 方法) is not allowed'
             })
           }
         },
-        ClassDeclaration (node) {
+        ClassDeclaration (node: ASTNode) {
           if (usePlugin('classes')) {
             context.report({
               node,
@@ -157,7 +152,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        ClassExpression (node) {
+        ClassExpression (node: ASTNode) {
           if (usePlugin('classes')) {
             context.report({
               node,
@@ -165,7 +160,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        MetaProperty (node) {
+        MetaProperty (node: ASTNode) {
           if (usePlugin('new-target')) {
             context.report({
               node,
@@ -173,8 +168,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // ---Modules---
-        ImportDeclaration (node) {
+        ImportDeclaration (node: ASTNode) {
           if (usePlugin('modules-commonjs')) {
             context.report({
               node,
@@ -182,8 +176,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // export {foo, bar}
-        ExportNamedDeclaration (node) {
+        ExportNamedDeclaration (node: ASTNode) {
           if (usePlugin('modules-commonjs')) {
             context.report({
               node,
@@ -191,8 +184,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // export default function () {}
-        ExportDefaultDeclaration (node) {
+        ExportDefaultDeclaration (node: ASTNode) {
           if (usePlugin('modules-commonjs')) {
             context.report({
               node,
@@ -200,8 +192,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        // export * from "mod"
-        ExportAllDeclaration (node) {
+        ExportAllDeclaration (node: ASTNode) {
           if (usePlugin('modules-commonjs')) {
             context.report({
               node,

@@ -1,4 +1,4 @@
-const versionMap = {
+export const versionMap: Record<string, string> = {
   es3: '3',
   es4: '4',
   es5: '5',
@@ -28,9 +28,10 @@ const versionMap = {
   es2019: '10',
   es2020: '11',
   es2021: '12',
-  es2022: '13'
+  es2022: '13',
+  hermes: 'hermes',
+  drn: 'drn'
 }
 
-module.exports = {
-  versionMap
-}
+export const HERMES_VERSION = 'hermes'
+export const DRN_VERSION = 'drn'

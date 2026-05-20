@@ -1,4 +1,6 @@
-module.exports = function (usePlugin) {
+import type { Rule, ASTNode } from '../types'
+
+export default function (usePlugin: (name: string) => boolean): Rule {
   return {
     meta: {
       docs: {
@@ -7,9 +9,9 @@ module.exports = function (usePlugin) {
     },
     create (context) {
       return {
-        // class 私有属性/方法
-        PropertyDefinition (node) {
-          if (node.key.type === 'PrivateIdentifier') {
+        PropertyDefinition (node: ASTNode) {
+          const key = node.key as { type?: string } | undefined
+          if (key?.type === 'PrivateIdentifier') {
             if (usePlugin('class-properties') && usePlugin('classes')) {
               context.report({
                 node,
@@ -18,16 +20,17 @@ module.exports = function (usePlugin) {
             }
           }
         },
-        MethodDefinition (node) {
+        MethodDefinition (node: ASTNode) {
           if (!usePlugin('class-properties') || !usePlugin('classes')) return
-          const handle = []
+          const handle: string[] = []
           if (node.kind === 'get' || node.kind === 'set') {
-            handle.push(node.kind)
+            handle.push(node.kind as string)
           }
-          if (node.static === true && node.computed === false) { // class 静态方法
+          if (node.static === true && node.computed === false) {
             handle.push('static')
           }
-          if (node.key.type === 'PrivateIdentifier') { // class 私有方法
+          const key = node.key as { type?: string } | undefined
+          if (key?.type === 'PrivateIdentifier') {
             handle.push('private')
           }
           if (handle.length) {
@@ -37,16 +40,16 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        AwaitExpression (node) {
-          // await import ('/xxx')
-          if (node.argument.type === 'ImportExpression' && usePlugin('modules-commonjs')) {
+        AwaitExpression (node: ASTNode) {
+          const arg = node.argument as { type?: string } | undefined
+          if (arg?.type === 'ImportExpression' && usePlugin('modules-commonjs')) {
             context.report({
               node,
               message: 'using await import("./xxx") is not allow'
             })
           }
         },
-        regex (node) {
+        regex (node: ASTNode) {
           if (node.flags === 'd') {
             context.report({
               node,

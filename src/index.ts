@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 
-const program = require('commander')
-const chalk = require('chalk')
-const pkg = require('./package.json')
-const runParseCode = require('./lib/index')
-
-const log = console.log
+import program from 'commander'
+import pkg from '../package.json'
+import runParseCode from './lib/index'
 
 program
   .version(pkg.version)
@@ -13,23 +10,18 @@ program
   .option('-m, --module', 'a modular way to parse code', 'script')
   .option('-a, --all', 'check code use all rules: include instance method & static method', false)
   .option('-mini, --miniprogram', 'check miniprogram grammar', false)
-  .option('-o, --output <output>', 'output path of result log', 'es-check.log')
+  .option('-o, --output <output>', 'output path of result log (omit to skip file output)')
   .option('-e, --ecma <version>', 'version of rules applied', '')
-  .action((parseFiles, options) => {
+  .action((parseFiles: string[], options: { module?: boolean | string; miniprogram?: boolean; ecma?: string; all?: boolean; output?: string }) => {
     const files = parseFiles.length ? parseFiles : []
     const esmodule = options.module
     const checkMiniprogram = options.miniprogram
     const version = options.ecma
     const useAllRules = options.all
-    const output = options.output
+    const output = options.output || null
 
-    const rs = runParseCode({ version, esmodule, files, useAllRules, output, checkMiniprogram })
-    if (rs.code !== 0) {
-      log(chalk.red(rs.msg))
-      process.exitCode = rs.code
-    } else {
-      log(chalk.green(rs.msg))
-    }
+    const rs = runParseCode({ version, esmodule: esmodule as boolean, files, useAllRules: useAllRules ?? false, output, checkMiniprogram })
+    process.exitCode = rs.code
   })
 
 program.parse(process.argv)

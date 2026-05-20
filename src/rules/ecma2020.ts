@@ -1,4 +1,6 @@
-module.exports = function (usePlugin) {
+import type { Rule, ASTNode } from '../types'
+
+export default function (usePlugin: (name: string) => boolean): Rule {
   return {
     meta: {
       docs: {
@@ -7,12 +9,7 @@ module.exports = function (usePlugin) {
     },
     create (context) {
       return {
-        /**
-         * 赋值的value 为 bigint 类型
-         * @param node
-         * @constructor
-         */
-        Literal (node) {
+        Literal (node: ASTNode) {
           if (node.bigint) {
             context.report({
               node,
@@ -20,18 +17,13 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        BigIntLiteral (node) {
+        BigIntLiteral (node: ASTNode) {
           context.report({
             node,
             message: 'there has BigIntLiteral'
           })
         },
-        /**
-         * 当出现 optional 语法时，例如：a?.b || a?.b.c || a.b?.c || a?.b?.c
-         * @param node
-         * @constructor
-         */
-        OptionalMemberExpression (node) {
+        OptionalMemberExpression (node: ASTNode) {
           if (usePlugin('optional-chaining')) {
             context.report({
               node,
@@ -39,7 +31,7 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        ChainExpression (node) { // plugin模式，使用的acorn解析，可选链结构类型是 ChainExpression
+        ChainExpression (node: ASTNode) {
           if (usePlugin('optional-chaining')) {
             context.report({
               node,
@@ -47,25 +39,15 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        /**
-         * import 表达式 例如：var a = import('b')
-         * @param node
-         * @constructor
-         */
-        ImportExpression (node) {
-          if (usePlugin('modules-commonjs')) { // && arrow-functions
+        ImportExpression (node: ASTNode) {
+          if (usePlugin('modules-commonjs')) {
             context.report({
               node,
               message: 'there has ImportExpression node，such as var a = import("b")'
             })
           }
         },
-        /**
-         * The operator property of the LogicalExpression node can be "??" to represent Nullish Coalescing syntax.
-         * @param node
-         * @constructor
-         */
-        LogicalExpression (node) {
+        LogicalExpression (node: ASTNode) {
           if (node.operator === '??' && usePlugin('nullish-coalescing-operator')) {
             context.report({
               node,
@@ -73,23 +55,13 @@ module.exports = function (usePlugin) {
             })
           }
         },
-        /**
-         * Existing MetaProperty node represents import.meta meta property as well.
-         * @param node
-         * @constructor
-         */
-        MetaProperty (node) {
+        MetaProperty (node: ASTNode) {
           context.report({
             node,
             message: 'Existing MetaProperty node represents import.meta meta property as well.'
           })
         },
-        /**
-         * The exported property contains an Identifier when a different exported name is specified using as, e.g., export * as foo from "mod"
-         * @param node
-         * @constructor
-         */
-        ExportAllDeclaration (node) {
+        ExportAllDeclaration (node: ASTNode) {
           if (usePlugin('modules-commonjs')) {
             context.report({
               node,

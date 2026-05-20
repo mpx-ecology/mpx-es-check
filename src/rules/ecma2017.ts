@@ -1,4 +1,6 @@
-module.exports = function (usePlugin = new Map()) {
+import type { Rule, ASTNode } from '../types'
+
+export default function (usePlugin: (name: string) => boolean): Rule {
   return {
     meta: {
       docs: {
@@ -7,7 +9,7 @@ module.exports = function (usePlugin = new Map()) {
     },
     create (context) {
       return {
-        FunctionDeclaration (node) {
+        FunctionDeclaration (node: ASTNode) {
           if (node.async === true && usePlugin('async-to-generator')) {
             context.report({
               node,
@@ -15,7 +17,7 @@ module.exports = function (usePlugin = new Map()) {
             })
           }
         },
-        ArrowFunctionExpression (node) {
+        ArrowFunctionExpression (node: ASTNode) {
           if (node.async === true && usePlugin('async-to-generator')) {
             context.report({
               node,
@@ -23,8 +25,9 @@ module.exports = function (usePlugin = new Map()) {
             })
           }
         },
-        AwaitExpression (node) {
-          if (node.argument.type === 'CallExpression' && usePlugin('async-to-generator')) {
+        AwaitExpression (node: ASTNode) {
+          const arg = node.argument as { type?: string } | undefined
+          if (arg?.type === 'CallExpression' && usePlugin('async-to-generator')) {
             context.report({
               node,
               message: 'Using await xxx() is not allowed'
