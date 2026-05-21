@@ -63,7 +63,7 @@ function getBabelConfig (): { list: string[]; plugins: babel.PluginItem[] } {
 }
 
 export default function collectRule (
-  rule: string | undefined,
+  target: string | undefined,
   useAllRules: boolean,
   options: CollectRuleOptions,
   checkMiniprogram?: boolean
@@ -73,7 +73,7 @@ export default function collectRule (
   let plugins: babel.PluginItem[] | null = null
   let list: string[] | null = null
 
-  if (!rule) {
+  if (!target) {
     const config = getBabelConfig()
     plugins = config.plugins
     list = config.list
@@ -89,14 +89,14 @@ export default function collectRule (
   }
 
   function checkPlugin (pluginName: string): boolean {
-    if (rule) return true
+    if (target) return true
     return usePlugins.has(pluginName)
   }
 
-  let esV = parseInt(versionMap[rule || 'es2015'] || '6', 10)
-  if (rule === HERMES_VERSION) {
+  let esV = parseInt(versionMap[target || 'es5'] || '6', 10)
+  if (target === HERMES_VERSION) {
     configuredRules.push(hermesRules())
-  } else if (rule === DRN_VERSION) {
+  } else if (target === DRN_VERSION) {
     configuredRules.push(drnRules())
   } else {
     while (esV <= 13) {

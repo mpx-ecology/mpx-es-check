@@ -16,9 +16,7 @@ import type { Problem, ASTNode, Rule } from '../types'
 const isWebpack5 = webpack.version && webpack.version[0] > '4'
 
 interface EsCheckPluginOptions {
-  rule?: string
-  /** @deprecated use `rule` instead */
-  version?: string
+  target?: string
   sourceType?: string
   filename?: string
   customRules?: Rule & { callback?: (result: { warnings: Problem[][]; errors: Problem[][] }, options: EsCheckPluginOptions, compilation: Compilation) => void }
@@ -70,13 +68,8 @@ class EsCheckPlugin {
     }, async (compilation) => {
       allBlockProblems = []
       allNonBlockProblems = []
-      const { sourceType } = this.options
-      let rule = this.options.rule
-      if (this.options.version && !rule) {
-        compilation.getLogger('EsCheckPlugin').warn('EsCheckPlugin: `version` option is deprecated, please use `rule` instead')
-        rule = this.options.version
-      }
-      if (!rule || !sourceType) {
+      const { target, sourceType } = this.options
+      if (!target || !sourceType) {
         console.error('配置项不全')
         return
       }
@@ -104,7 +97,7 @@ class EsCheckPlugin {
               if (mpx && mpx.assetsASTsMap) {
                 mpx.assetsASTsMap.set(name, result.ast)
               }
-              const configuredRules = collectRule(rule, false, this.options)
+              const configuredRules = collectRule(target, false, this.options)
               problems = runRules({ ast: result.ast }, configuredRules, true) || []
               traversedInfo = { hasProblem: false }
 

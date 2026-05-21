@@ -13,9 +13,7 @@ const chalk = new ChalkInstance()
 const acornBaseOpts = { ecmaVersion: 2050 as 2050, silent: true, locations: true }
 
 interface ParseCodeOptions {
-  rule?: string
-  /** @deprecated use `rule` instead */
-  version?: string
+  target?: string
   esmodule?: boolean | string
   files: string[]
   ignore?: string[]
@@ -26,14 +24,6 @@ interface ParseCodeOptions {
   sourceMap?: string
   silent?: boolean
   [key: string]: unknown
-}
-
-function resolveRule (options: ParseCodeOptions): string | undefined {
-  if (options.version && !options.rule) {
-    process.stderr.write('Warning: ParseCodeOptions.version is deprecated, please use `rule` instead\n')
-    return options.version
-  }
-  return options.rule
 }
 
 function getSourceMap (file: string): string | undefined {
@@ -64,16 +54,16 @@ function createLogger (output: string): Console {
 
 function check (file: string, code: string, options: ParseCodeOptions): Problem[] {
   const {
+    target,
     esmodule,
     useAllRules,
     checkMiniprogram,
     silent,
     output
   } = options
-  const rule = resolveRule(options)
 
   const acornOpts = { ...acornBaseOpts, sourceType: esmodule ? ('module' as const) : ('script' as const) }
-  const configuredRules = collectRule(rule, useAllRules ?? false, options, checkMiniprogram)
+  const configuredRules = collectRule(target, useAllRules ?? false, options, checkMiniprogram)
   const ast = parser.parse(code, acornOpts)
   const problems = runRules({ ast: ast as unknown as import('../types').ASTNode }, configuredRules) || []
   if (!silent && problems.length) {
@@ -89,10 +79,7 @@ function check (file: string, code: string, options: ParseCodeOptions): Problem[
 }
 
 function parseCode (options: ParseCodeOptions): { code: number } {
-  const rule = resolveRule(options)
-  // Normalize to avoid duplicate deprecation warnings inside check()
-  const normalizedOptions: ParseCodeOptions = { ...options, rule, version: undefined }
-  const { files, ignore, useAllRules, checkMiniprogram } = normalizedOptions
+  const { files, ignore, useAllRules } = options
 
   const globOpts = { nodir: true, ignore: ignore ?? [] }
   let hasProblem = false
@@ -108,7 +95,7 @@ function parseCode (options: ParseCodeOptions): { code: number } {
       const code = fs.readFileSync(file, 'utf8')
       const sourceMap = getSourceMap(file)
       const problems = check(file, code, {
-        ...normalizedOptions,
+        ...options,
         silent: false,
         sourceMap
       })
