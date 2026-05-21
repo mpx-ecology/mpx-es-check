@@ -21,7 +21,7 @@
     "compatibility"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "lint": "eslint --ext .ts ./src",
@@ -55,6 +55,7 @@
     "@types/esquery": "^1.5.4",
     "@types/estraverse": "^5.1.7",
     "@types/glob": "^7.2.0",
+    "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.24",
     "@types/node": "^20.19.41",
     "@types/source-map": "^0.5.7",
@@ -65,6 +66,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.10",
     "typescript": "^5.9.3"
   }
 }

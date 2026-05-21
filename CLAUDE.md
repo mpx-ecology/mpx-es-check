@@ -8,6 +8,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Build TypeScript source to dist/
 npm run build
 
+# Run unit tests (Jest)
+npm test
+
 # Lint the codebase
 npm run lint
 
@@ -15,13 +18,13 @@ npm run lint
 npm run fix
 
 # Run the CLI tool directly (local dev, after build)
-node dist/index.js --module --ecma=6 './tests/*.js'
+node dist/index.js --module --target=es5 './tests/*.js'
 
 # Run as globally-installed CLI
-mpx-es-check --module --ecma=6 './dist/*.js'
+mpx-es-check --module --target=es5 './dist/*.js'
 ```
 
-There are no automated tests configured (`npm test` exits with error). Manual testing uses the files in `tests/`.
+Unit tests run automatically as a pre-commit hook (`npm test`). Tests live in `__tests__/check.test.ts` and use Jest + ts-jest.
 
 ## Architecture
 
@@ -36,7 +39,7 @@ src/
     index.ts             # Shared interfaces: Problem, Rule, RuleContext, SafeEmitter, ASTNode
     core-js-compat.d.ts  # Local module declaration for core-js-compat
   lib/
-    constant.ts          # Version string → rule number mapping
+    constant.ts          # target string → first rule number mapping
     collect-rule.ts      # Rule collection logic
     check.ts             # AST traversal + rule dispatch
     format.ts            # ESLint-style output formatting + sourcemap application
@@ -45,7 +48,7 @@ src/
     safe-emitter.ts      # Event emitter for rule listeners
     node-event-generator.ts  # AST node → selector matching (adapted from ESLint)
     parse-assets.ts      # acorn-based AST parser (plugin mode)
-    plugin.ts            # Webpack plugin (EsCheckPlugin)
+    webpack-plugin.ts    # Webpack plugin (EsCheckPlugin)
     index.ts             # Core CLI logic + Node.js API (parseCode / check)
     definitions.ts       # core-js-compat property mappings (BuiltIns, InstanceProperties, StaticProperties)
   rules/
@@ -55,6 +58,9 @@ src/
     hermesRules.ts              # Hermes engine unsupported syntax/API rules
     drnRules.ts                 # DRN engine rules (extends Hermes + class + more)
 dist/                    # tsc output (gitignored)
+__tests__/
+  check.test.ts          # Jest unit tests (45 cases covering ES2015~ES2022 + hermes + drn)
+tests/                   # Manual test JS fixtures (gitignored)
 ```
 
 ### Two usage modes
@@ -65,7 +71,7 @@ dist/                    # tsc output (gitignored)
 - Reads sourcemaps (`.map` files) to map problems back to original source
 - Also exposed as Node.js API via `require('@mpxjs/es-check')`
 
-**2. Webpack plugin mode** (`src/lib/plugin.ts` → `EsCheckPlugin`):
+**2. Webpack plugin mode** (`src/lib/webpack-plugin.ts` → `EsCheckPlugin`):
 - Accessible via `require('@mpxjs/es-check/webpack-plugin')`
 - Hooks into webpack's `emit` stage (stage 2000, after assets are stable)
 - Reuses AST from `mpx.assetsASTsMap` when available (set by mpx-webpack-plugin)
@@ -82,9 +88,21 @@ AST traversal uses `@babel/traverse` in CLI mode and `estraverse` in plugin mode
 
 ### Rule collection (`src/lib/collect-rule.ts`)
 
-When `--ecma` / `version` is provided: loads all rules from that version up to the latest (ecma2022), so checking for ES6 means checking rules for ES2015–ES2022. Special values `hermes` and `drn` load their dedicated rule sets instead.
+When `--target` is provided: maps the target to a starting rule number, then loads rules from that version up to the latest (ecma2022). Semantics: `--target=esX` means the output must not contain syntax from esX+1 onwards. Special values `hermes` and `drn` load their dedicated rule sets instead.
 
-When no version is provided: reads the project's Babel config via `babel.loadPartialConfig()` and `core-js-compat` to determine which transforms/polyfills are needed, then only flags syntax/APIs that Babel should have but didn't transform.
+When no target is provided: reads the project's Babel config via `babel.loadPartialConfig()` and `core-js-compat` to determine which transforms/polyfills are needed, then only flags syntax/APIs that Babel should have but didn't transform.
+
+### Target mapping (`src/lib/constant.ts`)
+
+| Input | Target env | First rule checked |
+|---|---|---|
+| `5` / `es5` | ES5 | ecma2015 (rule6) |
+| `6` / `es6` / `es2015` | ES2015 | ecma2016 (rule7) |
+| `7` / `es7` / `es2016` | ES2016 | ecma2017 (rule8) |
+| ... | ... | ... |
+| `13` / `es13` / `es2022` | ES2022 | none |
+| `hermes` | Hermes engine | hermesRules |
+| `drn` | DRN engine | drnRules |
 
 ### Rule files (`src/rules/`)
 
@@ -94,9 +112,9 @@ When no version is provided: reads the project's Babel config via `babel.loadPar
 - `hermesRules.ts` — Hermes engine: disallows `with`, `import.meta`, `Symbol.species`, `Symbol.unscopables`, `Object.groupBy`, `Map.groupBy`
 - `drnRules.ts` — DRN engine: extends Hermes rules, additionally disallows class syntax, `for await...of`, dynamic `import()`, `FinalizationRegistry`, `Array.prototype.toSorted`, `Promise.withResolvers`, `ArrayBuffer.prototype.resize`, `structuredClone`
 
-### Version mapping (`src/lib/constant.ts`)
+### Known issue: ES2022 private class fields in CLI mode
 
-Accepts: `6`–`13`, `es6`–`es13`, `es2015`–`es2022`, `hermes`, `drn`. Maps to internal rule numbers (6=ecma2015, 13=ecma2022).
+`ecma2022.ts` listens for `PropertyDefinition` (ESTree spec), but `@babel/parser` emits `ClassPrivateProperty` / `ClassPrivateMethod` for private fields. This means private class field rules are only effective in webpack plugin mode (which uses `acorn` / ESTree AST), not in CLI mode.
 
 ### Problem severity
 
