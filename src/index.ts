@@ -13,12 +13,14 @@ program
   .option('-o, --output <output>', 'output path of result log (omit to skip file output)')
   .option('-r, --rule <rule>', 'rule set to apply (e.g. 6, es2015, hermes, drn)', '')
   .option('-e, --ecma <version>', '(deprecated, use --rule instead) version of rules applied', '')
-  .action((parseFiles: string[], options: { module?: boolean | string; miniprogram?: boolean; rule?: string; ecma?: string; all?: boolean; output?: string }) => {
+  .option('-i, --ignore <pattern>', 'glob pattern of files to exclude (repeatable)', (val: string, acc: string[]) => acc.concat(val), [] as string[])
+  .action((parseFiles: string[], options: { module?: boolean | string; miniprogram?: boolean; rule?: string; ecma?: string; all?: boolean; output?: string; ignore?: string[] }) => {
     const files = parseFiles.length ? parseFiles : []
     const esmodule = options.module
     const checkMiniprogram = options.miniprogram
     const useAllRules = options.all
     const output = options.output || null
+    const ignore = options.ignore ?? []
 
     let version = options.rule || ''
     if (options.ecma) {
@@ -30,7 +32,7 @@ program
       }
     }
 
-    const rs = runParseCode({ rule: version, esmodule: esmodule as boolean, files, useAllRules: useAllRules ?? false, output, checkMiniprogram })
+    const rs = runParseCode({ rule: version, esmodule: esmodule as boolean, files, ignore, useAllRules: useAllRules ?? false, output, checkMiniprogram })
     process.exitCode = rs.code
   })
 

@@ -18,6 +18,7 @@ interface ParseCodeOptions {
   version?: string
   esmodule?: boolean | string
   files: string[]
+  ignore?: string[]
   useAllRules?: boolean
   output?: string | null
   checkMiniprogram?: boolean
@@ -91,9 +92,9 @@ function parseCode (options: ParseCodeOptions): { code: number } {
   const rule = resolveRule(options)
   // Normalize to avoid duplicate deprecation warnings inside check()
   const normalizedOptions: ParseCodeOptions = { ...options, rule, version: undefined }
-  const { files, useAllRules, checkMiniprogram } = normalizedOptions
+  const { files, ignore, useAllRules, checkMiniprogram } = normalizedOptions
 
-  const globOpts = { nodir: true }
+  const globOpts = { nodir: true, ignore: ignore ?? [] }
   let hasProblem = false
 
   files.forEach(pattern => {

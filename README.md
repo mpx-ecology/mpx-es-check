@@ -20,6 +20,14 @@ npx mpx-es-check --module --rule=es2015 './dist/*.js'
 * `--module` 以 ES Module 模式解析代码，不设置则以 script 模式解析
 * `--rule <rule>` 指定规则集，详见下方 [--rule 可选值](#--rule-可选值)
 * `'./dist/*.js'` 检测文件范围，使用 glob pattern；在脚本中需加 `''` 包裹，避免 shell 展开
+  * 支持同时传多个 pattern，检测多个目录：
+    ```bash
+    npx mpx-es-check --rule=es2015 './dist/*.js' './lib/*.js'
+    ```
+* `--ignore <pattern>` 排除匹配该 glob 的文件，可重复使用多次：
+   ```bash
+   npx mpx-es-check --rule=es2015 './dist/**/*.js' --ignore='./dist/vendor/*.js' --ignore='./dist/polyfill.js'
+   ```
 * `--all` 同时检测实例方法和静态方法（基于 core-js-compat）
    ```bash
    npx mpx-es-check --module --rule=es2015 --all './dist/*.js'
@@ -70,7 +78,8 @@ const { check } = require('@mpxjs/es-check')
 // 检测一批文件（同 CLI），返回 { code: 0 | 1 }
 const result = esCheck({
   rule: 'es2015',
-  files: ['./dist/**/*.js'],
+  files: ['./dist/**/*.js', './lib/**/*.js'],  // 支持多个 glob pattern
+  ignore: ['./dist/vendor/**/*.js'],           // 排除文件，支持多个 glob pattern
   esmodule: true,
   useAllRules: false
 })
