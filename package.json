@@ -1,6 +1,6 @@
 {
   "name": "@mpxjs/es-check",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0",
   "description": "mpx es check",
   "bin": {
     "mpx-es-check": "dist/index.js"
@@ -8,7 +8,7 @@
   "main": "dist/lib/index.js",
   "exports": {
     ".": "./dist/lib/index.js",
-    "./webpack-plugin": "./dist/lib/plugin.js"
+    "./webpack-plugin": "./dist/lib/webpack-plugin.js"
   },
   "files": [
     "dist",
