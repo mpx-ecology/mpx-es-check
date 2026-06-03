@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const SourceMap = require('source-map')
 import type { Problem } from '../types'
+const SourceMap = require('source-map')
 
 interface SyncSourceMapConsumer {
   originalPositionFor(pos: { line: number; column: number }): { source: string | null; line: number | null; column: number | null }

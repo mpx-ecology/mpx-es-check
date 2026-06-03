@@ -1,5 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const babel = require('@babel/core') as typeof import('@babel/core')
 import coreJsCompat from 'core-js-compat'
 import browserslist from 'browserslist'
 import rule6 from '../rules/ecma2015'
@@ -16,6 +15,7 @@ import hermesRules from '../rules/hermesRules'
 import drnRules from '../rules/drnRules'
 import { versionMap, HERMES_VERSION, DRN_VERSION } from './constant'
 import type { Rule } from '../types'
+const babel = require('@babel/core') as typeof import('@babel/core')
 
 export interface CollectRuleOptions {
   customRules?: Rule

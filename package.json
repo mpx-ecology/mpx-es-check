@@ -23,7 +23,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run lint && npm test && npm run build",
     "lint": "eslint --ext .ts ./src",
     "fix": "eslint --fix --ext .ts ./src"
   },
@@ -60,6 +60,8 @@
     "@types/node": "^20.19.41",
     "@types/source-map": "^0.5.7",
     "@types/webpack": "^5.28.5",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^7.7.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.22.0",

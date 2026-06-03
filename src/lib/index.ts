@@ -10,7 +10,7 @@ import type { Problem, Rule } from '../types'
 
 const chalk = new ChalkInstance()
 
-const acornBaseOpts = { ecmaVersion: 2050 as 2050, silent: true, locations: true }
+const acornBaseOpts = { ecmaVersion: 2050 as const, silent: true, locations: true }
 
 interface ParseCodeOptions {
   target?: string

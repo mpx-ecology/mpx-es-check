@@ -1,10 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const babelTraverse = require('@babel/traverse').default
 import estraverse from 'estraverse'
 import createEmitter from './safe-emitter'
 import NodeEventGenerator from './node-event-generator'
 import createProblem from './create-problem'
 import type { ASTNode, Rule, Problem } from '../types'
+const babelTraverse = require('@babel/traverse').default
 
 function createRuleListeners (rule: Rule, ruleContext: Parameters<Rule['create']>[0]) {
   return rule.create(ruleContext)

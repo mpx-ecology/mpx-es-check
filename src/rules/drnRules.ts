@@ -131,7 +131,6 @@ export default function (): Rule {
             node,
             message: 'DRN does not support `ArrayBuffer.prototype.resize`.'
           })
-          return
         }
       }
 
