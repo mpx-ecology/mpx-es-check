@@ -7,13 +7,11 @@ import { getLogOutputPath } from './util'
 import { applySourceMap, formatProblems, formatProblemsPlain } from './format'
 import collectRule from './collect-rule'
 import type { Problem, Rule } from '../types'
+import { POLYFILL_PATH_RE } from './polyfill-re'
 
 const chalk = new ChalkInstance()
 
 const acornBaseOpts = { ecmaVersion: 2050 as const, silent: true, locations: true }
-
-export { POLYFILL_PATH_RE } from './polyfill-re'
-import { POLYFILL_PATH_RE } from './polyfill-re'
 
 interface ParseCodeOptions {
   target?: string
