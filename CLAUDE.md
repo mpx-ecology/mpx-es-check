@@ -134,3 +134,8 @@ When no target is provided: reads the project's Babel config via `babel.loadPart
 - `source-map` v0.5: `SourceMapConsumer` is synchronous; typed with a local interface
 - `estraverse`: traverse types use `import('estree').Node`
 - `esquery`: use `esquery.Selector` for parsed selector type
+
+
+## 提交代码
+
+提交代码前必须运行 build\test\lint检查，全都通过后才能提交
