@@ -1,6 +1,6 @@
 {
   "name": "@mpxjs/es-check",
-  "version": "1.0.3",
+  "version": "1.0.4-1",
   "description": "mpx es check",
   "bin": {
     "mpx-es-check": "dist/index.js"
@@ -23,7 +23,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "prepublishOnly": "npm run lint && npm test && npm run build",
+    "prepublishOnly": "rm -rf dist && npm run lint && npm test && npm run build",
     "lint": "eslint --ext .ts ./src",
     "fix": "eslint --fix --ext .ts ./src"
   },

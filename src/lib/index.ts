@@ -12,6 +12,8 @@ const chalk = new ChalkInstance()
 
 const acornBaseOpts = { ecmaVersion: 2050 as const, silent: true, locations: true }
 
+export const POLYFILL_PATH_RE = /(^|[\\/])node_modules[\\/](core-js(?:-pure|-compat)?|@babel[\\/](?:runtime|polyfill)|regenerator-runtime)[\\/]/
+
 interface ParseCodeOptions {
   target?: string
   esmodule?: boolean | string
@@ -23,6 +25,8 @@ interface ParseCodeOptions {
   customRules?: Rule
   sourceMap?: string
   silent?: boolean
+  ignorePolyfills?: boolean
+  allowSyntax?: string[]
   [key: string]: unknown
 }
 
@@ -52,6 +56,19 @@ function createLogger (output: string): Console {
   return new console.Console(stderr)
 }
 
+function filterProblems (problems: Problem[], options: ParseCodeOptions): Problem[] {
+  const ignorePolyfills = options.ignorePolyfills !== false
+  const allowSyntax = options.allowSyntax ?? []
+  return problems.filter(problem => {
+    if (ignorePolyfills && problem.sourceFile && POLYFILL_PATH_RE.test(problem.sourceFile)) return false
+    if (allowSyntax.length && allowSyntax.some(s =>
+      (problem.nodeType != null && problem.nodeType === s) ||
+      problem.message.includes(s)
+    )) return false
+    return true
+  })
+}
+
 function check (file: string, code: string, options: ParseCodeOptions): Problem[] {
   const {
     target,
@@ -65,10 +82,13 @@ function check (file: string, code: string, options: ParseCodeOptions): Problem[
   const acornOpts = { ...acornBaseOpts, sourceType: esmodule ? ('module' as const) : ('script' as const) }
   const configuredRules = collectRule(target, useAllRules ?? false, options, checkMiniprogram)
   const ast = parser.parse(code, acornOpts)
-  const problems = runRules({ ast: ast as unknown as import('../types').ASTNode }, configuredRules) || []
-  if (!silent && problems.length) {
+  let problems = runRules({ ast: ast as unknown as import('../types').ASTNode }, configuredRules) || []
+  if (problems.length) {
     problems.forEach(p => { p.file = file })
     applySourceMap(problems, options.sourceMap)
+    problems = filterProblems(problems, options)
+  }
+  if (!silent && problems.length) {
     console.log(formatProblems(problems, chalk))
     if (output) {
       const logger = createLogger(output)

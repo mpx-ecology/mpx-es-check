@@ -243,6 +243,162 @@ describe('DRN 规则', () => {
 })
 
 // ─────────────────────────────────────────────
+// allowSyntax 白名单
+// ─────────────────────────────────────────────
+describe('allowSyntax 白名单', () => {
+  const baseOpts = { files: [], silent: true, target: 'es5' }
+
+  test('不配置时，箭头函数报错', () => {
+    const p = check('f.js', 'const fn = () => 1', baseOpts)
+    expect(p.length).toBeGreaterThan(0)
+  })
+
+  test('按 nodeType 精确匹配，箭头函数不报错', () => {
+    // 用 var 避免 const 同时报错
+    const p = check('f.js', 'var fn = () => 1', {
+      ...baseOpts,
+      allowSyntax: ['ArrowFunctionExpression']
+    })
+    expect(p).toHaveLength(0)
+  })
+
+  test('按 nodeType 只忽略命中的类型，其他仍报错', () => {
+    // let + 箭头函数，只白名单箭头函数
+    const p = check('f.js', 'let fn = () => 1', {
+      ...baseOpts,
+      allowSyntax: ['ArrowFunctionExpression']
+    })
+    // let 仍应报错
+    expect(hasMsg(p, 'let')).toBe(true)
+    // 箭头函数不报错
+    expect(p.some(x => x.nodeType === 'ArrowFunctionExpression')).toBe(false)
+  })
+
+  test('按 message 子串匹配，Map.groupBy 不报错', () => {
+    const p = check('f.js', 'Map.groupBy([], x => x)', {
+      ...baseOpts,
+      target: 'hermes',
+      allowSyntax: ['Map.groupBy']
+    })
+    expect(p.filter(x => x.message.includes('Map.groupBy'))).toHaveLength(0)
+  })
+
+  test('按 message 子串仅忽略命中项，其他仍报错', () => {
+    // hermes 下：with + Map.groupBy，只白名单 Map.groupBy
+    const p = check('f.js', 'with ({}) {}; Map.groupBy([], x => x)', {
+      ...baseOpts,
+      target: 'hermes',
+      allowSyntax: ['Map.groupBy']
+    })
+    expect(hasMsg(p, 'with')).toBe(true)
+    expect(p.some(x => x.message.includes('Map.groupBy'))).toBe(false)
+  })
+
+  test('allowSyntax 为空数组时不过滤任何报错', () => {
+    const p = check('f.js', 'const fn = () => 1', { ...baseOpts, allowSyntax: [] })
+    expect(p.length).toBeGreaterThan(0)
+  })
+})
+
+// ─────────────────────────────────────────────
+// ignorePolyfills
+// ─────────────────────────────────────────────
+describe('ignorePolyfills', () => {
+  // 构造一个 sourcemap，将第1行第0列映射到 core-js-pure 路径
+  const coreJsSourceMap = JSON.stringify({
+    version: 3,
+    sources: ['node_modules/core-js-pure/internals/map-group-by.js'],
+    names: [],
+    mappings: 'AAAA',
+    file: 'bundle.js'
+  })
+
+  // 构造一个 sourcemap，映射到业务文件路径
+  const appSourceMap = JSON.stringify({
+    version: 3,
+    sources: ['src/app.js'],
+    names: [],
+    mappings: 'AAAA',
+    file: 'bundle.js'
+  })
+
+  const code = 'Map.groupBy([], x => x)'
+  const baseOpts = { files: [], silent: true, target: 'hermes' }
+
+  test('默认开启：sourceFile 属于 core-js-pure 时忽略报错', () => {
+    const p = check('bundle.js', code, { ...baseOpts, sourceMap: coreJsSourceMap })
+    expect(p).toHaveLength(0)
+  })
+
+  test('ignorePolyfills=false：即使 sourceFile 属于 core-js 也报错', () => {
+    const p = check('bundle.js', code, {
+      ...baseOpts,
+      sourceMap: coreJsSourceMap,
+      ignorePolyfills: false
+    })
+    expect(hasMsg(p, 'Map.groupBy')).toBe(true)
+  })
+
+  test('sourceFile 属于业务代码时仍然报错', () => {
+    const p = check('bundle.js', code, { ...baseOpts, sourceMap: appSourceMap })
+    expect(hasMsg(p, 'Map.groupBy')).toBe(true)
+  })
+
+  test('无 sourcemap 时（sourceFile 未设置）不过滤，正常报错', () => {
+    const p = check('bundle.js', code, baseOpts)
+    expect(hasMsg(p, 'Map.groupBy')).toBe(true)
+  })
+
+  test('core-js（不带 -pure）路径同样被忽略', () => {
+    const sm = JSON.stringify({
+      version: 3,
+      sources: ['node_modules/core-js/modules/es.map.group-by.js'],
+      names: [],
+      mappings: 'AAAA',
+      file: 'bundle.js'
+    })
+    const p = check('bundle.js', code, { ...baseOpts, sourceMap: sm })
+    expect(p).toHaveLength(0)
+  })
+
+  test('@babel/runtime 路径同样被忽略', () => {
+    const sm = JSON.stringify({
+      version: 3,
+      sources: ['node_modules/@babel/runtime/helpers/classCallCheck.js'],
+      names: [],
+      mappings: 'AAAA',
+      file: 'bundle.js'
+    })
+    const arrowCode = 'var fn = () => 1'
+    const p = check('bundle.js', arrowCode, {
+      files: [],
+      silent: true,
+      target: 'es5',
+      sourceMap: sm
+    })
+    expect(p).toHaveLength(0)
+  })
+
+  test('regenerator-runtime 路径同样被忽略', () => {
+    const sm = JSON.stringify({
+      version: 3,
+      sources: ['node_modules/regenerator-runtime/runtime.js'],
+      names: [],
+      mappings: 'AAAA',
+      file: 'bundle.js'
+    })
+    const asyncCode = 'async function f() {}'
+    const p = check('bundle.js', asyncCode, {
+      files: [],
+      silent: true,
+      target: 'es5',
+      sourceMap: sm
+    })
+    expect(p).toHaveLength(0)
+  })
+})
+
+// ─────────────────────────────────────────────
 // target 别名等价验证
 // ─────────────────────────────────────────────
 describe('target 别名等价', () => {

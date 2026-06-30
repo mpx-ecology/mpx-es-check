@@ -7,6 +7,7 @@ import fs from 'fs'
 import { Instance as ChalkInstance } from 'chalk'
 import runRules from './check'
 import parseAsset from './parse-assets'
+import { POLYFILL_PATH_RE } from './index'
 import webpack from 'webpack'
 import collectRule from './collect-rule'
 import { applySourceMap, formatProblems, formatProblemsPlain } from './format'
@@ -19,8 +20,20 @@ interface EsCheckPluginOptions {
   target?: string
   sourceType?: string
   filename?: string
+  ignorePolyfills?: boolean
+  /**
+   * 语法白名单。数组中每个字符串可以是：
+   *   - AST 节点类型，如 `"ArrowFunctionExpression"`、`"TemplateLiteral"`
+   *   - problem.message 的子串，如 `"Map.groupBy"`、`"for...of"`
+   * 匹配到任意一条即跳过该 problem。
+   */
+  allowSyntax?: string[]
   customRules?: Rule & { callback?: (result: { warnings: Problem[][]; errors: Problem[][] }, options: EsCheckPluginOptions, compilation: Compilation) => void }
   [key: string]: unknown
+}
+
+function isPolyfillSource (sourceFile: string | undefined): boolean {
+  return !!sourceFile && POLYFILL_PATH_RE.test(sourceFile)
 }
 
 interface TraversedInfo {
@@ -104,9 +117,17 @@ class EsCheckPlugin {
               if (problems.length) {
                 problems.forEach(p => { p.file = name })
                 const sourceMapAsset = compilation.assets[name + '.map']
-                const sourceMapCode = sourceMapAsset && (sourceMapAsset as unknown as { _value?: string })._value
+                const _value = sourceMapAsset && (sourceMapAsset as unknown as { _value?: string | Buffer })._value
+                const sourceMapCode = Buffer.isBuffer(_value) ? _value.toString('utf-8') : _value
                 applySourceMap(problems, sourceMapCode, compiler.context)
+                const ignorePolyfills = this.options.ignorePolyfills !== false
+                const allowSyntax = this.options.allowSyntax ?? []
                 problems.forEach(problem => {
+                  if (ignorePolyfills && isPolyfillSource(problem.sourceFile)) return
+                  if (allowSyntax.length && allowSyntax.some(s =>
+                    (problem.nodeType != null && problem.nodeType === s) ||
+                    problem.message.includes(s)
+                  )) return
                   if (problem.type === 'warning') {
                     nonBlockProblems.push(problem)
                   } else {

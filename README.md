@@ -37,6 +37,11 @@ npx mpx-es-check --module --target=es5 './dist/*.js'
    ```bash
    npx mpx-es-check --module --target=es5 --output ./dist/es-check.log './dist/*.js'
    ```
+* `--no-ignore-polyfills` 关闭对 polyfill 库报错的自动忽略（默认开启，见下方说明）
+* `--allow-syntax <items>` 语法白名单，逗号分隔，支持 AST 节点类型或 message 子串
+   ```bash
+   npx mpx-es-check --target=es5 --allow-syntax 'ArrowFunctionExpression,Map.groupBy' './dist/*.js'
+   ```
 
 ### --target 可选值
 
@@ -83,7 +88,9 @@ const result = esCheck({
   files: ['./dist/**/*.js', './lib/**/*.js'],  // 支持多个 glob pattern
   ignore: ['./dist/vendor/**/*.js'],           // 排除文件，支持多个 glob pattern
   esmodule: true,
-  useAllRules: false
+  useAllRules: false,
+  ignorePolyfills: true,                       // 忽略来自 polyfill 库的报错，默认 true
+  allowSyntax: ['ArrowFunctionExpression'],    // 语法白名单，nodeType 或 message 子串
 })
 process.exitCode = result.code
 
@@ -91,7 +98,9 @@ process.exitCode = result.code
 const problems = check('foo.js', 'const x = () => 1', {
   target: 'es5',
   files: [],
-  silent: true
+  silent: true,
+  ignorePolyfills: true,
+  allowSyntax: ['Map.groupBy'],
 })
 ```
 
@@ -111,6 +120,10 @@ module.exports = {
       sourceType: 'script',
       // 可选：检测结果输出文件名，输出到 webpack output 目录；不填则不写文件
       // filename: 'es-check.log',
+      // 可选：忽略 polyfill 库的报错，默认 true，详见下方"通用选项说明"
+      // ignorePolyfills: true,
+      // 可选：语法白名单，详见下方"通用选项说明"
+      // allowSyntax: ['ArrowFunctionExpression', 'Map.groupBy'],
       // 可选：自定义规则扩展，callback 接收 { warnings, errors } 两个数组
       customRules: {
         callback ({ warnings, errors }, options, compilation) {
@@ -127,6 +140,59 @@ module.exports = {
 - 检测到语法错误时构建失败；配置 `filename` 后错误详情同时写入 `<output.path>/<filename>`
 - 插件复用 mpx-webpack-plugin 生成的 AST（如果存在），避免重复解析
 - 支持 watch 模式，每次重新编译结果独立不累积
+
+## 通用选项说明
+
+以下选项在 CLI、Node.js API、Webpack 插件三种使用方式中行为一致。
+
+### `ignorePolyfills`
+
+默认开启（CLI 默认不传即为开启，Node.js API / Webpack 插件默认 `true`）。
+
+通过 sourcemap 将报错位置追溯回源文件，若源文件路径属于以下 polyfill 库则自动忽略该报错，避免误报：
+
+| 库 | 匹配路径 |
+|---|---|
+| core-js / core-js-pure / core-js-compat | `node_modules/core-js*` |
+| @babel/runtime / @babel/polyfill | `node_modules/@babel/runtime`、`node_modules/@babel/polyfill` |
+| regenerator-runtime | `node_modules/regenerator-runtime` |
+
+关闭方式：
+
+```bash
+# CLI
+npx mpx-es-check --target=es5 --no-ignore-polyfills './dist/*.js'
+```
+
+```js
+// Node.js API / Webpack 插件
+ignorePolyfills: false
+```
+
+### `allowSyntax`
+
+语法白名单，默认为空（不忽略任何报错）。可用于业务上已确认兼容、无需报错的语法或 API。
+
+每个字符串与报错做两种匹配，任意命中即忽略该条报错：
+
+| 匹配方式 | 说明 |
+|---|---|
+| **nodeType 精确匹配** | 字符串等于报错的 AST 节点类型（`problem.nodeType`） |
+| **message 子串匹配** | 字符串包含于报错消息（`problem.message`） |
+
+```bash
+# CLI：逗号分隔
+npx mpx-es-check --target=es5 --allow-syntax 'ArrowFunctionExpression,Map.groupBy' './dist/*.js'
+```
+
+```js
+// Node.js API / Webpack 插件：字符串数组
+allowSyntax: [
+  'ArrowFunctionExpression',  // 按 nodeType 忽略所有箭头函数报错
+  'Map.groupBy',              // 按 message 子串忽略 Map.groupBy 报错
+  'for...of',                 // 按 message 子串忽略 for...of 报错
+]
+```
 
 ## 结果输出
 
