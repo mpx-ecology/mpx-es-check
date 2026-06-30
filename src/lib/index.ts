@@ -12,7 +12,8 @@ const chalk = new ChalkInstance()
 
 const acornBaseOpts = { ecmaVersion: 2050 as const, silent: true, locations: true }
 
-export const POLYFILL_PATH_RE = /(^|[\\/])node_modules[\\/](core-js(?:-pure|-compat)?|@babel[\\/](?:runtime|polyfill)|regenerator-runtime)[\\/]/
+export { POLYFILL_PATH_RE } from './polyfill-re'
+import { POLYFILL_PATH_RE } from './polyfill-re'
 
 interface ParseCodeOptions {
   target?: string
