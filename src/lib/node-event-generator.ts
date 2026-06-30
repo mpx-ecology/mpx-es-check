@@ -153,7 +153,7 @@ class NodeEventGenerator {
           if (!typeMap.has(nodeType)) {
             typeMap.set(nodeType, [])
           }
-          typeMap.get(nodeType)!.push(selector)
+          (typeMap.get(nodeType) as typeof selector[]).push(selector)
         })
         return
       }

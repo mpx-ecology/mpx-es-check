@@ -51,7 +51,7 @@ export function formatProblems (problems: Problem[], chalk: { underline: (s: str
   problems.forEach(problem => {
     const file = problem.sourceFile || problem.file || '<unknown>'
     if (!byFile.has(file)) byFile.set(file, [])
-    byFile.get(file)!.push(problem)
+    ;(byFile.get(file) as Problem[]).push(problem)
   })
 
   const lines: string[] = []
@@ -79,7 +79,7 @@ export function formatProblemsPlain (problems: Problem[]): string {
   problems.forEach(problem => {
     const file = problem.sourceFile || problem.file || '<unknown>'
     if (!byFile.has(file)) byFile.set(file, [])
-    byFile.get(file)!.push(problem)
+    ;(byFile.get(file) as Problem[]).push(problem)
   })
 
   const lines: string[] = []
