@@ -1,0 +1,4 @@
+# 排除 jest 自动生成的 node_modules 缓存，但保留 fake polyfill fixtures
+# 这个目录下的 node_modules 是测试专用的 fake polyfill，需要纳入版本控制
+!node_modules/
+!node_modules/**

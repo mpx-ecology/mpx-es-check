@@ -1,3 +1,4 @@
 node_modules
 tests
 dist
+__tests__/fixtures
