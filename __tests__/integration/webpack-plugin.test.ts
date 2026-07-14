@@ -104,6 +104,21 @@ describe('EsCheckPlugin ignorePolyfills', () => {
 })
 
 // ─────────────────────────────────────────────────────────────────
+// ignoreSource
+// ─────────────────────────────────────────────────────────────────
+describe('EsCheckPlugin ignoreSource', () => {
+  test('ignorePolyfills=false 时仍可按 npm 包名忽略指定来源', async () => {
+    const stats = await runWebpack('wp-entry-polyfill.js', {
+      target: 'hermes',
+      sourceType: 'script',
+      ignorePolyfills: false,
+      ignoreSource: ['core-js']
+    })
+    expect(getErrors(stats)).toHaveLength(0)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────
 // allowSyntax
 // ─────────────────────────────────────────────────────────────────
 describe('EsCheckPlugin allowSyntax', () => {

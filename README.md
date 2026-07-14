@@ -28,6 +28,10 @@ npx mpx-es-check --module --target=es5 './dist/*.js'
    ```bash
    npx mpx-es-check --target=es5 './dist/**/*.js' --ignore='./dist/vendor/*.js' --ignore='./dist/polyfill.js'
    ```
+* `--ignore-source <pattern>` 忽略 sourcemap 映射后的指定源文件或 npm 包中的报错，可重复使用多次，支持包名、路径、`*` 通配和 `/.../flags` 正则：
+   ```bash
+   npx mpx-es-check --target=es5 './dist/**/*.js' --ignore-source='custom-polyfills' --ignore-source='@babel/*'
+   ```
 * `--all` 同时检测实例方法和静态方法（基于 core-js-compat）
    ```bash
    npx mpx-es-check --module --target=es5 --all './dist/*.js'
@@ -87,6 +91,7 @@ const result = esCheck({
   target: 'es5',
   files: ['./dist/**/*.js', './lib/**/*.js'],  // 支持多个 glob pattern
   ignore: ['./dist/vendor/**/*.js'],           // 排除文件，支持多个 glob pattern
+  ignoreSource: ['custom-polyfills'],          // 忽略指定源文件或 npm 包中的报错
   esmodule: true,
   useAllRules: false,
   ignorePolyfills: true,                       // 忽略来自 polyfill 库的报错，默认 true
@@ -100,6 +105,7 @@ const problems = check('foo.js', 'const x = () => 1', {
   files: [],
   silent: true,
   ignorePolyfills: true,
+  ignoreSource: ['src/vendor/polyfills'],
   allowSyntax: ['Map.groupBy'],
 })
 ```
@@ -122,6 +128,8 @@ module.exports = {
       // filename: 'es-check.log',
       // 可选：忽略 polyfill 库的报错，默认 true，详见下方"通用选项说明"
       // ignorePolyfills: true,
+      // 可选：忽略指定源文件或 npm 包中的报错，详见下方"通用选项说明"
+      // ignoreSource: ['custom-polyfills', 'src/vendor/polyfills'],
       // 可选：语法白名单，详见下方"通用选项说明"
       // allowSyntax: ['ArrowFunctionExpression', 'Map.groupBy'],
       // 可选：自定义规则扩展，callback 接收 { warnings, errors } 两个数组
@@ -144,6 +152,39 @@ module.exports = {
 ## 通用选项说明
 
 以下选项在 CLI、Node.js API、Webpack 插件三种使用方式中行为一致。
+
+### `ignoreSource`
+
+忽略指定源文件或 npm 包中的报错，默认为空（不额外忽略任何来源）。适用于项目使用了自定义 polyfills 工具库，或需要临时放过某些文件、某些 npm 包中无法转换的语法/API。
+
+匹配对象是 sourcemap 映射后的 `problem.sourceFile`；如果没有 sourcemap，则回退匹配产物文件名。匹配命中后，该来源下的所有 problem 都会被忽略。
+
+支持四类写法：
+
+| 写法 | 示例 | 说明 |
+|---|---|---|
+| npm 包名 | `custom-polyfills`、`@scope/polyfills` | 匹配 `node_modules/<package>/...` |
+| 文件或目录路径 | `src/vendor/polyfills`、`dist/polyfills.bundle.js` | 匹配对应路径或其子路径 |
+| `*` 通配 | `@babel/*`、`node_modules/custom-*`、`src/vendor/*` | 按路径片段通配匹配，可用于忽略一组包 |
+| 正则表达式 | `/node_modules\\/(@babel|custom-polyfills)\\//` | CLI 使用 `/.../flags` 字符串；Node.js API / Webpack 插件也可直接传 `RegExp` |
+
+```bash
+# CLI：可重复传入
+npx mpx-es-check --target=es5 './dist/**/*.js' \
+  --ignore-source='custom-polyfills' \
+  --ignore-source='@babel/*' \
+  --ignore-source='/node_modules\/(@babel|custom-polyfills)\//'
+```
+
+```js
+// Node.js API / Webpack 插件：字符串或 RegExp 数组
+ignoreSource: [
+  'custom-polyfills',
+  '@babel/*',
+  'src/vendor/polyfills',
+  /node_modules\/(@babel|custom-polyfills)\//,
+]
+```
 
 ### `ignorePolyfills`
 

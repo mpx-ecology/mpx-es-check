@@ -8,6 +8,8 @@ import { Instance as ChalkInstance } from 'chalk'
 import runRules from './check'
 import parseAsset from './parse-assets'
 import { POLYFILL_PATH_RE } from './polyfill-re'
+import { isIgnoredSource } from './ignore-source'
+import type { IgnoreSourcePattern } from './ignore-source'
 import webpack from 'webpack'
 import collectRule from './collect-rule'
 import { applySourceMap, formatProblems, formatProblemsPlain } from './format'
@@ -21,6 +23,11 @@ interface EsCheckPluginOptions {
   sourceType?: string
   filename?: string
   ignorePolyfills?: boolean
+  /**
+   * 需要忽略的源码文件或 npm 包。匹配 sourcemap 映射后的 sourceFile；
+   * 无 sourcemap 时回退匹配产物文件名。支持包名、路径、* 通配和正则。
+   */
+  ignoreSource?: IgnoreSourcePattern[]
   /**
    * 语法白名单。数组中每个字符串可以是：
    *   - AST 节点类型，如 `"ArrowFunctionExpression"`、`"TemplateLiteral"`
@@ -121,9 +128,11 @@ class EsCheckPlugin {
                 const sourceMapCode = Buffer.isBuffer(_value) ? _value.toString('utf-8') : _value
                 applySourceMap(problems, sourceMapCode, compiler.context)
                 const ignorePolyfills = this.options.ignorePolyfills !== false
+                const ignoreSource = this.options.ignoreSource ?? []
                 const allowSyntax = this.options.allowSyntax ?? []
                 problems.forEach(problem => {
                   if (ignorePolyfills && isPolyfillSource(problem.sourceFile)) return
+                  if (isIgnoredSource(problem.sourceFile || problem.file, ignoreSource)) return
                   if (allowSyntax.length && allowSyntax.some(s =>
                     (problem.nodeType != null && problem.nodeType === s) ||
                     problem.message.includes(s)

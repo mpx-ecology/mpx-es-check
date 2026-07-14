@@ -399,6 +399,132 @@ describe('ignorePolyfills', () => {
 })
 
 // ─────────────────────────────────────────────
+// ignoreSource
+// ─────────────────────────────────────────────
+describe('ignoreSource', () => {
+  const code = 'Map.groupBy([], x => x)'
+  const baseOpts = {
+    files: [],
+    silent: true,
+    target: 'hermes',
+    ignorePolyfills: false
+  }
+
+  test('按 npm 包名忽略 sourcemap 映射后的 sourceFile', () => {
+    const sm = JSON.stringify({
+      version: 3,
+      sources: ['node_modules/custom-polyfills/map-group-by.js'],
+      names: [],
+      mappings: 'AAAA',
+      file: 'bundle.js'
+    })
+    const p = check('bundle.js', code, {
+      ...baseOpts,
+      sourceMap: sm,
+      ignoreSource: ['custom-polyfills']
+    })
+    expect(p).toHaveLength(0)
+  })
+
+  test('按源码路径忽略 sourcemap 映射后的 sourceFile', () => {
+    const sm = JSON.stringify({
+      version: 3,
+      sources: ['src/vendor/polyfills/map-group-by.js'],
+      names: [],
+      mappings: 'AAAA',
+      file: 'bundle.js'
+    })
+    const p = check('bundle.js', code, {
+      ...baseOpts,
+      sourceMap: sm,
+      ignoreSource: ['src/vendor/polyfills']
+    })
+    expect(p).toHaveLength(0)
+  })
+
+  test('支持 glob 忽略一组 scoped npm 包', () => {
+    const sm = JSON.stringify({
+      version: 3,
+      sources: ['node_modules/@babel/runtime/helpers/classCallCheck.js'],
+      names: [],
+      mappings: 'AAAA',
+      file: 'bundle.js'
+    })
+    const p = check('bundle.js', 'var fn = () => 1', {
+      files: [],
+      silent: true,
+      target: 'es5',
+      ignorePolyfills: false,
+      sourceMap: sm,
+      ignoreSource: ['@babel/*']
+    })
+    expect(p).toHaveLength(0)
+  })
+
+  test('Node.js API 支持 RegExp 对象', () => {
+    const sm = JSON.stringify({
+      version: 3,
+      sources: ['node_modules/@babel/runtime/helpers/classCallCheck.js'],
+      names: [],
+      mappings: 'AAAA',
+      file: 'bundle.js'
+    })
+    const p = check('bundle.js', 'var fn = () => 1', {
+      files: [],
+      silent: true,
+      target: 'es5',
+      ignorePolyfills: false,
+      sourceMap: sm,
+      ignoreSource: [/node_modules\/@babel\//]
+    })
+    expect(p).toHaveLength(0)
+  })
+
+  test('CLI 字符串形式支持正则表达式', () => {
+    const sm = JSON.stringify({
+      version: 3,
+      sources: ['node_modules/@babel/runtime/helpers/classCallCheck.js'],
+      names: [],
+      mappings: 'AAAA',
+      file: 'bundle.js'
+    })
+    const p = check('bundle.js', 'var fn = () => 1', {
+      files: [],
+      silent: true,
+      target: 'es5',
+      ignorePolyfills: false,
+      sourceMap: sm,
+      ignoreSource: ['/node_modules\\/@babel\\//']
+    })
+    expect(p).toHaveLength(0)
+  })
+
+  test('无 sourcemap 时回退按产物文件名忽略', () => {
+    const p = check('dist/polyfills.bundle.js', code, {
+      ...baseOpts,
+      ignoreSource: ['dist/polyfills.bundle.js']
+    })
+    expect(p).toHaveLength(0)
+  })
+
+  test('未匹配 ignoreSource 时仍然报错', () => {
+    const sm = JSON.stringify({
+      version: 3,
+      sources: ['src/app.js'],
+      names: [],
+      mappings: 'AAAA',
+      file: 'bundle.js'
+    })
+    const p = check('bundle.js', code, {
+      ...baseOpts,
+      sourceMap: sm,
+      ignoreSource: ['custom-polyfills']
+    })
+    expect(hasMsg(p, 'Map.groupBy')).toBe(true)
+  })
+})
+
+// ─────────────────────────────────────────────
 // target 别名等价验证
 // ─────────────────────────────────────────────
 describe('target 别名等价', () => {

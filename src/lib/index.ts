@@ -8,6 +8,8 @@ import { applySourceMap, formatProblems, formatProblemsPlain } from './format'
 import collectRule from './collect-rule'
 import type { Problem, Rule } from '../types'
 import { POLYFILL_PATH_RE } from './polyfill-re'
+import { isIgnoredSource } from './ignore-source'
+import type { IgnoreSourcePattern } from './ignore-source'
 
 const chalk = new ChalkInstance()
 
@@ -25,6 +27,7 @@ interface ParseCodeOptions {
   sourceMap?: string
   silent?: boolean
   ignorePolyfills?: boolean
+  ignoreSource?: IgnoreSourcePattern[]
   allowSyntax?: string[]
   [key: string]: unknown
 }
@@ -57,9 +60,11 @@ function createLogger (output: string): Console {
 
 function filterProblems (problems: Problem[], options: ParseCodeOptions): Problem[] {
   const ignorePolyfills = options.ignorePolyfills !== false
+  const ignoreSource = options.ignoreSource ?? []
   const allowSyntax = options.allowSyntax ?? []
   return problems.filter(problem => {
     if (ignorePolyfills && problem.sourceFile && POLYFILL_PATH_RE.test(problem.sourceFile)) return false
+    if (isIgnoredSource(problem.sourceFile || problem.file, ignoreSource)) return false
     if (allowSyntax.length && allowSyntax.some(s =>
       (problem.nodeType != null && problem.nodeType === s) ||
       problem.message.includes(s)
